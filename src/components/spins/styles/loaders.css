@@ -1,0 +1,55 @@
+.activity-indicator .spinner * {
+  box-sizing: border-box;
+}
+.activity-indicator .spinner {
+  display: inline-block;
+  animation: activity-indicator 0.7s infinite linear;
+}
+.activity-indicator .spinner .circle {
+  width: 2em;
+  height: 1em;
+  overflow: hidden;
+}
+.activity-indicator .spinner .circle-inner {
+  transform: rotate(45deg);
+  border-radius: 50%;
+  border: 0.25em solid currentColor;
+  border-right: 0.25em solid transparent;
+  border-bottom: 0.25em solid transparent;
+  width: 100%;
+  height: 200%;
+  animation: activity-indicator-1 0.7s infinite alternate
+    cubic-bezier(0.25, 0.1, 0.5, 1);
+}
+.activity-indicator .spinner .circle-2 {
+  transform: rotate(180deg);
+}
+.activity-indicator .spinner .circle-2 .circle-inner {
+  animation-name: activity-indicator-2;
+}
+
+@keyframes activity-indicator-1 {
+    from {
+        transform: rotate(70deg); /* increased from 60deg */
+    }
+    to {
+        transform: rotate(120deg); /* increased from 100deg */
+    }
+}
+@keyframes activity-indicator-2 {
+    from {
+        transform: rotate(40deg); /* increased from 30deg */
+    }
+    to {
+        transform: rotate(-105deg); /* decreased from -115deg */
+    }
+}
+
+@keyframes activity-indicator {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

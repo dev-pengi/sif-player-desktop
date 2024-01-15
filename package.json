@@ -1,0 +1,112 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "type": "commonjs",
+  "name": "sif-player",
+  "author": {
+    "name": "sifedine",
+    "url": "https://sifedine.com",
+    "email": "siffffdoul@gmail.com"
+  },
+  "description": "a modern, simple yet powerful and feature-rich video player",
+  "main": "public/main.js",
+  "homepage": "/",
+  "repository": "https://github.com/dev-pengi/sif-player-desktop",
+  "publish": {
+    "provider": "github",
+    "releaseType": "release"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "electron:serve": "concurrently -k \"yarn dev\" \"yarn electron:start\"",
+    "electron:build": "yarn build && yarn electron:dist",
+    "electron:dist": "electron-builder -c.extraMetadata.main=build/main.js",
+    "electron:start": "wait-on tcp:5173 && electron ."
+  },
+  "build": {
+    "productName": "Sif Player",
+    "artifactName": "${name}.${ext}",
+    "extends": null,
+    "appId": "com.sifedine.player",
+    "fileAssociations": [
+      {
+        "ext": "mp4",
+        "name": "MP4 Media",
+        "role": "Player",
+        "icon": "public/file.ico"
+      },
+      {
+        "ext": "webm",
+        "name": "WebM Media",
+        "role": "Player",
+        "icon": "public/file.ico"
+      },
+      {
+        "ext": "ogg",
+        "name": "OGG Media",
+        "role": "Player",
+        "icon": "public/file.ico"
+      },
+      {
+        "ext": "kmv",
+        "name": "MP4 Media",
+        "role": "Player",
+        "icon": "public/file.ico"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    },
+    "files": [
+      "build/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.1",
+    "@radix-ui/themes": "^2.0.3",
+    "@reduxjs/toolkit": "^2.0.1",
+    "autoprefixer": "^10.4.16",
+    "electron-is-dev": "2.0.0",
+    "electron-updater": "^6.1.7",
+    "framer-motion": "^10.16.5",
+    "lodash": "^4.17.21",
+    "postcss": "^8.4.31",
+    "rc-slider": "^10.5.0",
+    "react": "^18.2.0",
+    "react-contexify": "^6.0.0",
+    "react-dom": "^18.2.0",
+    "react-hotkeys-hook": "^4.4.1",
+    "react-redux": "^9.0.4",
+    "react-router-dom": "^6.20.0",
+    "react-switch": "^7.0.0",
+    "redux": "^5.0.1",
+    "tailwindcss": "^3.3.5",
+    "updater": "^0.0.1",
+    "wait-on": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.1.3",
+    "electron-builder": "^24.9.1",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}

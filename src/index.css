@@ -1,0 +1,203 @@
+@import url("https://fonts.googleapis.com/css?family=Baloo+Paaji|Open+Sans:300,300i,400,400i,600,600i,700,700i");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* main theme */
+  --primary: #9e35e8;
+  --dark: #101010;
+  --white: #ffffff;
+  --light-2: #e6e6e6;
+  --light-2-lighter: #d1d1d1;
+  --light-3: #b7b7b7;
+  --gray-1: #d0d1d3;
+  --gray-2: #8a8c91;
+  --gray-3: #5e6064;
+  --gray-4: #3f4145;
+  --gray-5: #2e3033;
+  /* menu themes */
+  --menu-bgColor: #000000e0;
+  --separator-color: #666666;
+  --activeItem-color: #fff;
+  --activeItem-bgColor: #4d4d4d96;
+}
+.rt-DropdownMenuViewport {
+  padding: 0px 0 !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 0px !important;
+  z-index: 999999;
+}
+.rt-DropdownMenuContent {
+  min-width: 150px;
+  padding: 8px 0 !important;
+  background-color: var(--menu-bgColor) !important;
+  border: 2px solid hsla(0, 0%, 100%, 0.233) !important;
+  outline: none !important;
+  border-radius: 6px !important;
+  margin-right: 20px;
+  min-width: 200px;
+  z-index: 999999;
+}
+
+.rt-DropdownMenuItem {
+  border-radius: 0 !important;
+  padding: 21px 18px !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+}
+.rt-DropdownMenuItem[data-accent-color="red"] {
+  color: #ff2a2a !important;
+}
+.rt-DropdownMenuItem[data-accent-color="red"][data-highlighted] {
+  background-color: rgba(237, 76, 92, 1) !important;
+  color: #eeeeee !important;
+}
+.rt-DropdownMenuItem:hover,
+.rt-DropdownMenuItem[data-highlighted] {
+  background-color: var(--activeItem-bgColor) !important;
+  color: var(--activeItem-color) !important;
+}
+
+.rt-DropdownMenuItem[data-accent-color="red"]:hover {
+  background-color: rgba(237, 76, 92, 1) !important;
+  color: #eeeeee !important;
+}
+.rt-BaseMenuSeparator {
+  background-color: var(--separator-color) !important;
+
+  margin: 8px 0 !important;
+}
+.rt-DropdownMenuItem:hover {
+  background-color: var(--gray-4);
+  color: var(--dark);
+}
+.rt-DropdownMenuItem[data-highlighted] {
+  background-color: var(--gray-4);
+  color: var(--dark);
+}
+
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  text-decoration: none;
+  list-style: none;
+  outline: none;
+  border: none;
+  font-family: "Open Sans", "Ubuntu", sans-serif !important;
+  color: var(--white);
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+a {
+  color: currentColor;
+}
+
+body {
+  background-color: var(--dark) !important;
+  color: var(--white);
+  overflow-x: hidden !important;
+  pointer-events: auto !important;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2e3033;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5e6064;
+  cursor: default;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8a8c91;
+}
+
+.min-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.hidden-track::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+}
+
+.top-shadow {
+  background: rgb(0, 0, 0);
+  background: -moz-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8016456582633054) 0%,
+    rgba(0, 0, 0, 0.38988095238095233) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background: -webkit-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8016456582633054) 0%,
+    rgba(0, 0, 0, 0.38988095238095233) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8016456582633054) 0%,
+    rgba(0, 0, 0, 0.38988095238095233) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#000000",GradientType=1);
+}
+
+.bottom-shadow {
+  background: rgb(0, 0, 0);
+  background: -moz-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.8016456582633054) 0%,
+    rgba(0, 0, 0, 0.38988095238095233) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background: -webkit-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.8016456582633054) 0%,
+    rgba(0, 0, 0, 0.38988095238095233) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.8016456582633054) 0%,
+    rgba(0, 0, 0, 0.38988095238095233) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#000000",GradientType=1);
+}
+
+.drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
