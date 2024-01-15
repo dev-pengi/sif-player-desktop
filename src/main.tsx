@@ -11,7 +11,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
       <PlayerContextProvider>
         <Provider store={store}>
+      <HashRouter>
           <App />
+      </HashRouter>
         </Provider>
       </PlayerContextProvider>
   </React.StrictMode>

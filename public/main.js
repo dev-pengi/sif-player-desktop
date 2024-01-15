@@ -69,25 +69,28 @@ function createWindow() {
     return { action: "deny" };
   });
 
-  // if (!isDev) {
-  const customMenuTemplate = [];
+  if (!isDev) {
+    const customMenuTemplate = [];
 
-  const customMenu = Menu.buildFromTemplate(customMenuTemplate);
-  Menu.setApplicationMenu(customMenu);
-  // }
+    const customMenu = Menu.buildFromTemplate(customMenuTemplate);
+    Menu.setApplicationMenu(customMenu);
+  }
 
   require("@electron/remote/main").enable(win.webContents);
   const buildURL = `file://${path.join(__dirname, "../build/index.html")}`;
-  console.log(buildURL);
   const currentURL = isDev ? "http://localhost:5173" : buildURL;
+  if (isDev) {
+    win.openDevTools();
+  }
 
-  win.openDevTools();
-
-  win.loadURL(buildURL);
+  win.loadURL(currentURL);
 
   if (process.argv.length >= 2) {
     let filePath = process.argv[1];
+
+    console.log(filePath);
     ipcMain.on("request-file-path", (event) => {
+      console.log(filePath);
       event.sender.send("file-path", filePath);
     });
   }
@@ -98,6 +101,10 @@ function createWindow() {
 
   ipcMain.on("minimize", () => {
     win.minimize();
+  });
+
+  ipcMain.on("platform", (event) => {
+    event.sender.send("platform", process.platform);
   });
 
   ipcMain.on("maximize", () => {

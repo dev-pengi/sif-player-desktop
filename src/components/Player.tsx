@@ -14,6 +14,8 @@ import {
 import { useDispatch } from "react-redux";
 import { playerActions } from "../store";
 import { useAppSelector } from "../hooks";
+const fs = window.require("fs");
+const path = window.require("path");
 
 const useVideoSrc = () => {
   const location = useLocation();
@@ -23,13 +25,13 @@ const useVideoSrc = () => {
     const handleVideoSrc = async () => {
       const queryParams = new URLSearchParams(location.search);
       const src = queryParams.get("src");
-      const type = queryParams.get("type");
+      const playType = queryParams.get("type");
 
       const { protocol, host } = window.location;
-      if (type === "local") {
+      if (playType === "local") {
         const blobUrl = `blob:${protocol}//${host}/${src}`;
         dispatch(playerActions.source(blobUrl));
-      } else {
+      } else if (playType === "url") {
         dispatch(playerActions.source(src));
         const url = src;
         const controller = new AbortController();
@@ -47,6 +49,30 @@ const useVideoSrc = () => {
 
         dispatch(playerActions.updateData({ name, url, size, type }));
         controller.abort();
+      } else if (playType === "file") {
+        const url = src;
+        const file = path.parse(url);
+        const stats = await fs.promises.stat(url);
+        const size = stats.size;
+        const type = `video/${file.ext.slice(1)}`;
+        const name = file.name;
+        const creationTime = stats.birthtimeMs;
+        const lastModified = stats.mtimeMs;
+        const lastAccessed = stats.atimeMs;
+        console.log(stats);
+
+        dispatch(
+          playerActions.updateData({
+            name,
+            url,
+            size,
+            type,
+            creationTime,
+            lastModified,
+            lastAccessed,
+          })
+        );
+        dispatch(playerActions.source(url));
       }
     };
 

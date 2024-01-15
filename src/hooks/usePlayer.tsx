@@ -19,6 +19,14 @@ const usePlayer = () => {
     else document.body.requestFullscreen();
   };
 
+  const enterFullScreen = () => {
+    document.body.requestFullscreen();
+  }
+
+  const leaveFullScreen = () => {
+    document.exitFullscreen();
+  }
+
   const handleBack = () => {
     navigate("/");
   };
@@ -95,6 +103,8 @@ const usePlayer = () => {
     handleTogglePiP,
     requestPiP,
     cancelPiP,
+    enterFullScreen,
+    leaveFullScreen,
   };
 };
 

@@ -16,5 +16,7 @@ import CloseIcon from "./CloseIcon";
 import DownIcon from './DownIcon'
 import WindowMaximizeIcon from './WindowMaximizeIcon'
 import DashIcon from './DashIcon'
+import FolderIcon from "./FolderIcon";
+import FileIcon from "./FileIcon";
 
-export { PlayIcon, PauseIcon, MaximizeIcon, MinimizeIcon, MaxSoundIcon, MinSoundIcon, MuteSoundIcon, BackIcon, PlaybackSpeedIcon, CheckIcon, LinkIcon, MenuIcon, LockIcon, UnlockIcon, CloseIcon, DownIcon, WindowMaximizeIcon, DashIcon };
+export { PlayIcon, PauseIcon, MaximizeIcon, MinimizeIcon, MaxSoundIcon, MinSoundIcon, MuteSoundIcon, BackIcon, PlaybackSpeedIcon, CheckIcon, LinkIcon, MenuIcon, LockIcon, UnlockIcon, CloseIcon, DownIcon, WindowMaximizeIcon, DashIcon, FolderIcon, FileIcon };

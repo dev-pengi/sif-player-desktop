@@ -123,17 +123,6 @@ const useEvents = () => {
     };
   }, [playInBackground, isBackgroundPause, isPlaying]);
 
-  useEffect(() => {
-    toast.showToast(`Volume: ${volume}%`);
-  }, [volume]);
-
-  useEffect(() => {
-    toast.showToast(`Loop: ${isLoop ? "on" : "off"}`);
-  }, [isLoop]);
-
-  useEffect(() => {
-    toast.showToast(isPlaying ? "Playing" : "Paused");
-  }, [isPlaying]);
 };
 
 export default useEvents;

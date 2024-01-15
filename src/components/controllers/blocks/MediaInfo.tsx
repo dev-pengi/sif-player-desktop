@@ -1,10 +1,13 @@
 import { FC } from "react";
-import { usePlayerContext } from "../../../contexts";
 import { Separator } from "./Settings";
-import { useSelector } from "react-redux";
 import { useAppSelector } from "../../../hooks";
+import moment from "moment";
 
 const MediaInfo: FC = () => {
+  const formatTime = (time) => {
+    return moment(time).format("MMMM Do YYYY, h:mm:ss a");
+  };
+
   function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 bytes";
 
@@ -73,7 +76,7 @@ const MediaInfo: FC = () => {
     }
   };
 
-  const { mediaData } = useAppSelector(state => state.player);
+  const { mediaData } = useAppSelector((state) => state.player);
   const mediaName = mediaData?.name ?? "Untitled Media";
   const mediaType = mediaData?.type ?? "Unspecified Type";
   const mediaSize = mediaData?.size ?? "Unspecified Size";
@@ -101,6 +104,36 @@ const MediaInfo: FC = () => {
         <h3 className="opacity-95">Resolution:</h3>
         <p className="ml-6 opacity-80">{formatResolution(mediaResolution)}</p>
       </div>
+      {(mediaData?.creationTime ||
+        mediaData?.lastModified ||
+        mediaData?.lastAccessed) && <Separator />}
+
+      {mediaData?.creationTime && (
+        <div className="flex items-center py-2">
+          <h3 className="opacity-95">Created:</h3>
+          <p className="ml-6 opacity-80">
+            {formatTime(mediaData.creationTime)}
+          </p>
+        </div>
+      )}
+
+      {mediaData?.lastModified && (
+        <div className="flex items-center py-2">
+          <h3 className="opacity-95">Modified:</h3>
+          <p className="ml-6 opacity-80">
+            {formatTime(mediaData.lastModified)}
+          </p>
+        </div>
+      )}
+
+      {mediaData?.lastAccessed && (
+        <div className="flex items-center py-2">
+          <h3 className="opacity-95">Accessed:</h3>
+          <p className="ml-6 opacity-80">
+            {formatTime(mediaData.lastAccessed)}
+          </p>
+        </div>
+      )}
     </>
   );
 };
