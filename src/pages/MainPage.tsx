@@ -9,8 +9,10 @@ import {
 } from "../assets";
 import { useNavigate } from "react-router-dom";
 import { ActivityIndicator } from "../components/spins";
-import { useAppSelector, useClean } from "../hooks";
+import { useClean } from "../hooks";
 import { DirChain } from "../components";
+
+
 const { ipcRenderer } = window.require("electron");
 const path = window.require("path");
 const fs = window.require("fs");
