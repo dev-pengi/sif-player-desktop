@@ -112,13 +112,23 @@ function createWindow() {
     else win.maximize();
   });
 
-  ipcMain.on("shutdown-machine", () => {
+  ipcMain.on("shutdown", () => {
     if (process.platform === "win32") {
       exec("shutdown /s /t 0");
     } else if (process.platform === "linux") {
       exec("shutdown now");
     } else if (process.platform === "darwin") {
       exec("shutdown -h now");
+    }
+  });
+
+  ipcMain.on("sleep", () => {
+    if (process.platform === "win32") {
+      exec("shutdown /h");
+    } else if (process.platform === "linux") {
+      exec("systemctl suspend");
+    } else if (process.platform === "darwin") {
+      exec("pmset sleepnow");
     }
   });
 }

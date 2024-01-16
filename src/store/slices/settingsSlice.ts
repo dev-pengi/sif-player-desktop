@@ -25,7 +25,7 @@ const defaultSettings = {
     darkLayerOpacity: 0.2,
     sleepMode: false,
     sleepModeDelay: 30, // in minutes
-    sleepModeBehavior: "pause", // pause, quit video
+    sleepModeBehavior: "pause", // pause, quit video, close app, pc sleep, pc shutdown
 }
 
 const colorCheck = (color: string) => {

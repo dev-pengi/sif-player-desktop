@@ -4,6 +4,7 @@
     "max": 90
   },
   "sleepModeDelay": [
+    { "value": 1.01, "label": "1.01 minutes" },
     { "value": 10, "label": "10 minutes" },
     { "value": 15, "label": "15 minutes" },
     { "value": 30, "label": "30 minutes" },
@@ -13,7 +14,10 @@
   ],
   "sleepModeBehavior": [
     { "value": "pause", "label": "pause video" },
-    { "value": "quit", "label": "quit video" }
+    { "value": "quit", "label": "quit video" },
+    { "value": "close", "label": "close app" },
+    { "value": "sleep", "label": "sleep pc" },
+    { "value": "shutdown", "label": "shutdown pc" }
   ],
   "breakDelay": [
     { "value": 0.2, "label": "12 seconds" },

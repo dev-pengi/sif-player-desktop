@@ -3,7 +3,7 @@ import { useAppSelector, usePlayer } from "../../hooks";
 import { Modal } from "../modals";
 import { findLabel, formatTime } from "../../utils";
 import { settings } from "../../constants";
-
+const { ipcRenderer } = window.require("electron");
 
 type HandleAction = () => void;
 
@@ -18,7 +18,11 @@ const getSleepAction = (
     case "quit":
       return handleBack;
     case "close":
-      return window.close;
+      return () => ipcRenderer.send("close");
+    case "sleep":
+      return () => ipcRenderer.send("sleep");
+    case "shutdown":
+      return () => ipcRenderer.send("shutdown");
   }
 };
 
@@ -50,7 +54,7 @@ const SleepMode: FC = () => {
   };
 
   const timeoutDuration = sleepModeDelay * 1000 * 60;
-  const sleepAlertDelay = 60000; 
+  const sleepAlertDelay = 60000;
 
   useEffect(() => {
     if (!sleepMode || !lastActivityTime) return;
@@ -98,7 +102,9 @@ const SleepMode: FC = () => {
           Your {findLabel(settings.sleepModeDelay, sleepModeDelay)} sleep
           countdown is almost over!
         </p>
-        <h2 className="mx-2 text-[60px] opacity-90">{formatTime(remainingSleepTime)}</h2>
+        <h2 className="mx-2 text-[60px] opacity-90">
+          {formatTime(remainingSleepTime)}
+        </h2>
         <p className="text-[14px] opacity-75 mt-2">
           NOTE: you can interact with the app to cancel the sleep mode
         </p>

@@ -72,7 +72,7 @@ const Preferences: FC = () => {
       <Separator />
       <SettingCol
         title="Play In Background"
-        description="keep playing the media when you leave the tab or the browser"
+        description="keep playing the media when you leave the application"
       >
         <Switch
           onChange={handleTogglePlayInBackground}

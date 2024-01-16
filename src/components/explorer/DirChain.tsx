@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { MenuIcon } from "../../assets";
+import { HomeIcon, MenuIcon } from "../../assets";
 
 interface DirChainProps {
   dirsChain: string[];
@@ -22,14 +22,14 @@ const DirItem: FC<DirItemProps> = ({ dirName, dirsChain, onClick, index }) => {
 
   return (
     <>
-      {!isInLastTwoDirs && isFirstDir && (
+      {isFirstDir && (
         <>
           <div
             key={index}
             onClick={() => onClick(dirName, index)}
-            className="flex items-center text-[15px] rounded-md cursor-pointer hover:bg-[#ffffff21] px-2 py-1 duration-100"
+            className="flex items-center text-[22px] rounded-md cursor-pointer hover:bg-[#ffffff21] px-2 py-1 duration-100"
           >
-            {dirName}
+            <HomeIcon />
           </div>
           {!isLastDir && <span className="text-[15px] mx-1">{">"}</span>}
         </>
@@ -46,19 +46,20 @@ const DirItem: FC<DirItemProps> = ({ dirName, dirsChain, onClick, index }) => {
           <span className="text-[15px] mx-1">{">"}</span>
         </>
       )}
-      {isInLastTwoDirs && (
-        <>
-          <div
-            key={index}
-            onClick={() => onClick(dirName, index)}
-            className="flex items-center text-[15px] rounded-md cursor-pointer hover:bg-[#ffffff21] px-2 py-1 duration-100"
-            title={dirName}
-          >
-            <p className="max-w-[225px] truncate">{dirName}</p>
-          </div>
-          {!isLastDir && <span className="text-[15px] mx-1">{">"}</span>}
-        </>
-      )}
+      {isInLastTwoDirs &&
+        !isFirstDir && (
+          <>
+            <div
+              key={index}
+              onClick={() => onClick(dirName, index)}
+              className="flex items-center text-[15px] rounded-md cursor-pointer hover:bg-[#ffffff21] px-2 py-1 duration-100"
+              title={dirName}
+            >
+              <p className="max-w-[225px] truncate">{dirName}</p>
+            </div>
+            {!isLastDir && <span className="text-[15px] mx-1">{">"}</span>}
+          </>
+        )}
     </>
   );
 };
