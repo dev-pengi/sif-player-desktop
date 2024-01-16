@@ -12,7 +12,7 @@ jobs:
           ref: feature/github-actions
       - uses: actions/setup-node@master
         with:
-          node-version: 10.16
+          node-version: 18.x
       - name: install node tools
         run: npm install --global --production windows-build-tools@4.0.0
       - name: install node-gyp
