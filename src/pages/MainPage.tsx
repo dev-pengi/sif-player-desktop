@@ -18,7 +18,7 @@ const os = window.require("os");
 
 const MainPage: FC = () => {
   const navigate = useNavigate();
-  console.log(localStorage.getItem("last-dir"))
+  console.log(localStorage.getItem("last-dir"));
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [currentDir, setCurrentDir] = useState<string>(
     localStorage.getItem("last-dir") || os.homedir()
@@ -165,15 +165,17 @@ const MainPage: FC = () => {
           </button>
         </div>
       </nav>
-      <div className="flex w-full h-[calc(100%-35px)] fixed top-[35px]">
-        <div className="h-full w-full overflow-y-scroll">
+      <div className="flex w-full h-[calc(100%-35px)] fixed top-[35px] py-3 px-3 ">
+        <div className="h-full w-full overflow-y-auto min-scrollbar">
           <div className="py-3 px-3 flex items-center">
-            <button
-              onClick={handleBack}
-              className="bg-[#ffffff16] flex items-center px-1.5 py-1.5 text-[20px] rounded-md"
-            >
-              <BackIcon />
-            </button>
+            {path.dirname(currentDir) !== currentDir && (
+              <button
+                onClick={handleBack}
+                className="bg-[#ffffff16] flex items-center px-1.5 py-1.5 text-[20px] rounded-md"
+              >
+                <BackIcon />
+              </button>
+            )}
             <DirChain
               dirsChain={dirsChain}
               onClick={(_, index) => {

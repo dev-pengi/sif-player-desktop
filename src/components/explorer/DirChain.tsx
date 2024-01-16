@@ -52,9 +52,9 @@ const DirItem: FC<DirItemProps> = ({ dirName, dirsChain, onClick, index }) => {
             key={index}
             onClick={() => onClick(dirName, index)}
             className="flex items-center text-[15px] rounded-md cursor-pointer hover:bg-[#ffffff21] px-2 py-1 duration-100"
-            style={{}}
+            title={dirName}
           >
-            {dirName}
+            <p className="max-w-[225px] truncate">{dirName}</p>
           </div>
           {!isLastDir && <span className="text-[15px] mx-1">{">"}</span>}
         </>
