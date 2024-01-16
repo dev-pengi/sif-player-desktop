@@ -18,6 +18,7 @@ const os = window.require("os");
 
 const MainPage: FC = () => {
   const navigate = useNavigate();
+  console.log(localStorage.getItem("last-dir"))
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [currentDir, setCurrentDir] = useState<string>(
     localStorage.getItem("last-dir") || os.homedir()
@@ -122,6 +123,7 @@ const MainPage: FC = () => {
 
   const handleNavigate = (dir: string) => {
     setCurrentDir(dir);
+    localStorage.setItem("last-dir", dir);
   };
 
   const handleBack = () => {
@@ -198,7 +200,7 @@ const MainPage: FC = () => {
                         key={dir.path}
                         onClick={() => {
                           if (dir.dir) {
-                            setCurrentDir(dir.path);
+                            handleNavigate(dir.path);
                           } else {
                             navigate(`/player?src=${dir.path}&type=file`);
                           }
