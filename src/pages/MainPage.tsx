@@ -134,9 +134,9 @@ const MainPage: FC = () => {
   return (
     <div className="h-screen">
       <nav
-        className="flex w-full items-center h-[35px] fixed drag"
+        className="flex w-full items-center h-[45px] fixed drag"
         style={{
-          borderBottom: `2px solid #ffffff21`,
+          borderBottom: `1px solid #ffffff21`,
         }}
       >
         <div className="flex flex-1">
@@ -147,25 +147,25 @@ const MainPage: FC = () => {
         <div className="flex flex-row-reverse h-full items-center no-drag">
           <button
             onClick={handleClose}
-            className="px-3 h-full duration-100 text-[18px] hover:bg-red-500"
+            className="w-[45px] flex items-center justify-center h-full duration-100 text-[18px] hover:bg-red-500"
           >
             <CloseIcon />
           </button>
           <button
             onClick={handleMaximizeToggle}
-            className="px-3 h-full duration-100 text-[14px] hover:bg-[#ffffff21]"
+            className="w-[45px] flex items-center justify-center h-full duration-100 text-[14px] hover:bg-[#ffffff21]"
           >
             <WindowMaximizeIcon />
           </button>
           <button
             onClick={handleMinimize}
-            className="px-3 h-full duration-100  hover:bg-[#ffffff21]"
+            className="w-[45px] flex items-center justify-center h-full duration-100  hover:bg-[#ffffff21]"
           >
             <DashIcon />
           </button>
         </div>
       </nav>
-      <div className="flex w-full h-[calc(100%-35px)] fixed top-[35px] py-3 px-3 ">
+      <div className="flex w-full h-[calc(100%-45px)] fixed top-[45px] py-3 px-3 ">
         <div className="h-full w-full overflow-y-auto min-scrollbar">
           <div className="py-3 px-3 flex items-center">
             {path.dirname(currentDir) !== currentDir && (
@@ -186,7 +186,7 @@ const MainPage: FC = () => {
           </div>
           <div className="mt-1 w-full h-max flex">
             {isLoadingFiles ? (
-              <div className="flex items-center justify-center  mt-[120px] w-full">
+              <div className="flex items-center justify-center mt-[120px] w-full">
                 <ActivityIndicator />
               </div>
             ) : (

@@ -1,10 +1,10 @@
 {
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "commonjs",
   "name": "sif-player",
   "author": {
-    "name": "sifedine",
+    "name": "Sifedine",
     "url": "https://sifedine.com",
     "email": "siffffdoul@gmail.com"
   },
