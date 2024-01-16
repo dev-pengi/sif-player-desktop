@@ -9,7 +9,8 @@ import {
 } from "../assets";
 import { useNavigate } from "react-router-dom";
 import { ActivityIndicator } from "../components/spins";
-import { useClean } from "../hooks";
+import { useAppSelector, useClean } from "../hooks";
+import { DirChain } from "../components";
 const { ipcRenderer } = window.require("electron");
 const path = window.require("path");
 const fs = window.require("fs");
@@ -18,10 +19,10 @@ const os = window.require("os");
 const MainPage: FC = () => {
   const navigate = useNavigate();
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-  const [currentDir, setCurrentDir] = useState<string>(os.homedir());
-  const [dirsChain, setDirsChain] = useState<string[]>(
-    currentDir.split(path.sep)
+  const [currentDir, setCurrentDir] = useState<string>(
+    localStorage.getItem("last-dir") || os.homedir()
   );
+  const [dirsChain, setDirsChain] = useState<string[]>([]);
   const [dirs, setDirs] = useState([]);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const MainPage: FC = () => {
   };
 
   const fetchFiles = async (dir?: string) => {
-    dir = dir || currentDir;
+    dir = path.join(dir || currentDir);
     setIsLoadingFiles(true);
     const dirents = await fs.promises.readdir(currentDir, {
       withFileTypes: true,
@@ -52,28 +53,33 @@ const MainPage: FC = () => {
 
     for (const dirent of dirents) {
       const res = path.resolve(currentDir, dirent.name);
-      const dirStat = await fs.promises.stat(res);
 
-      if (dirent.isDirectory() && !dirent.name.startsWith(".")) {
-        dirs_files.push({
-          name: dirent.name,
-          dir: true,
-          path: res,
-          parent: currentDir,
-          creationDate: dirStat.birthtime,
-        });
-      } else {
-        const ext = path.extname(dirent.name).slice(1);
-        if (videoFormats.includes(ext)) {
+      try {
+        const dirStat = await fs.promises.stat(res);
+
+        if (dirent.isDirectory() && !dirent.name.startsWith(".")) {
           dirs_files.push({
             name: dirent.name,
-            dir: false,
-            type: ext,
+            dir: true,
             path: res,
             parent: currentDir,
             creationDate: dirStat.birthtime,
           });
+        } else {
+          const ext = path.extname(dirent.name).slice(1);
+          if (videoFormats.includes(ext)) {
+            dirs_files.push({
+              name: dirent.name,
+              dir: false,
+              type: ext,
+              path: res,
+              parent: currentDir,
+              creationDate: dirStat.birthtime,
+            });
+          }
         }
+      } catch (error) {
+        continue;
       }
     }
 
@@ -88,8 +94,23 @@ const MainPage: FC = () => {
       return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
     });
 
-    const splitDirs = currentDir.split(path.sep);
-    setDirsChain(splitDirs);
+    const chain: string[] = [];
+    let isFinished = false;
+    let currentChainDir = currentDir;
+
+    while (!isFinished) {
+      const baseName = path.basename(currentChainDir);
+      if (baseName) {
+        chain.push(path.basename(currentChainDir));
+        currentChainDir = path.dirname(currentChainDir);
+      } else {
+        const root = path.parse(currentChainDir).root;
+        chain.push(root);
+        isFinished = true;
+      }
+    }
+
+    setDirsChain(chain.reverse());
 
     setDirs(dirs_files);
     setIsLoadingFiles(false);
@@ -97,14 +118,15 @@ const MainPage: FC = () => {
 
   useEffect(() => {
     fetchFiles(currentDir);
-    console.log(currentDir);
   }, [currentDir]);
 
+  const handleNavigate = (dir: string) => {
+    setCurrentDir(dir);
+  };
+
   const handleBack = () => {
-    const splitDirs = currentDir.split(path.sep);
-    splitDirs.pop();
-    const newDir = path.join(...splitDirs);
-    setCurrentDir(newDir);
+    const baseDir = path.dirname(currentDir);
+    handleNavigate(baseDir);
   };
 
   return (
@@ -150,19 +172,13 @@ const MainPage: FC = () => {
             >
               <BackIcon />
             </button>
-            <div className="flex items-center ml-3 gap-0.5">
-              {dirsChain.map((dir, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setCurrentDir(path.join(...dirsChain.slice(0, index + 1)));
-                  }}
-                  className="flex items-center text-[15px] rounded-md cursor-pointer"
-                >
-                  {dir} /
-                </div>
-              ))}
-            </div>
+            <DirChain
+              dirsChain={dirsChain}
+              onClick={(_, index) => {
+                let newPath = path.join(...dirsChain.slice(0, index + 1));
+                handleNavigate(newPath);
+              }}
+            />
           </div>
           <div className="mt-1 w-full h-max flex">
             {isLoadingFiles ? (
