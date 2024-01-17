@@ -18,7 +18,7 @@ function App() {
     ipcRenderer.send("request-file-path");
     ipcRenderer.on("file-path", async (event, filePath) => {
       const fileCheck = path.parse(filePath);
-      const findExt = ["mp4", "mkv", "webm", "avi", "mov", "wmv", "mpg"];
+      const findExt = ["mp4", "mkv", "webm", "avi", "mov", "wmv", "mpg", "ogg"];
       const findPath = await fs.promises.readdir(fileCheck.dir);
       if (!findPath) return;
       const isVideo = findExt.includes(fileCheck.ext.slice(1));

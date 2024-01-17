@@ -74,6 +74,12 @@
         "name": "MPG Media",
         "role": "Viewer",
         "icon": "public/file.ico"
+      },
+      {
+        "ext": "ogg",
+        "name": "OGG Media",
+        "role": "Viewer",
+        "icon": "public/file.ico"
       }
     ],
     "win": {
