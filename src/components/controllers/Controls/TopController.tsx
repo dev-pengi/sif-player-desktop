@@ -42,19 +42,19 @@ const TopController: FC = () => {
       {controllersDeps.length && !isLocked && (
         <>
           <nav
-            className="flex w-full items-center h-[45px] fixed drag"
+            className="flex w-full items-center justify-between h-[45px] fixed drag"
             style={{
               borderBottom: `1px solid #ffffff21`,
             }}
           >
-            <div className="flex flex-1">
-              <div className="ml-3 font-bold text-[13px] opacity-80 tracking-wide">
-                <div className="relative flex items-center justify-center no-drag">
+            <div className="flex max-w-[min(800px,60%)]">
+              <div className="ml-3 font-bold w-full text-[13px] opacity-80 tracking-wide">
+                <div className="relative flex items-center justify-start no-drag">
                   <BackButton />
                   <div className="relative ml-3 flex items-center justify-center">
                     <MenuButton />
                   </div>
-                  <p className="ml-3">{videoName}</p>
+                  <p className="ml-3 truncate break-words">{videoName}</p>
                 </div>
               </div>
             </div>

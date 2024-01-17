@@ -6,6 +6,7 @@ const {
   shell,
   dialog,
   Tray,
+  nativeImage,
 } = require("electron");
 const { exec } = require("child_process");
 const { autoUpdater } = require("electron-updater");
@@ -13,6 +14,7 @@ const { autoUpdater } = require("electron-updater");
 require("@electron/remote/main").initialize();
 
 const path = require("path");
+const fs = require("fs");
 const isDev = require("electron-is-dev");
 
 function createWindow() {
@@ -45,6 +47,7 @@ function createWindow() {
     owner: "dev-pengi",
     private: false,
   });
+
 
   const checkForUpdates = () => {
     autoUpdater.checkForUpdates();

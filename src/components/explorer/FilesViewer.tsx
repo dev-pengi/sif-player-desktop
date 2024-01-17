@@ -115,12 +115,12 @@ const FilesViewer: FC = () => {
 
   const handleDelete = (dir) => {
     fs.rmSync(dir.path, { recursive: true, force: true });
-    fetchFiles();
+    setDirs((prev) => prev.filter((d) => d.path !== dir.path));
   };
 
   useHotkeys("backspace", handleBack, { keyup: true });
   useHotkeys("f5", () => fetchFiles(), { keyup: true });
-  
+
   return (
     <div className="h-full w-full overflow-y-auto min-scrollbar">
       <div className="py-3 px-3 flex items-center">

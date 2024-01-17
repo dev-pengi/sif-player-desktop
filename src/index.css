@@ -31,15 +31,32 @@
   border-radius: 0px !important;
   z-index: 999999;
 }
+
+.rt-HoverCardContent {
+  z-index: 999999;
+  background-color: var(--menu-bgColor) !important;
+  border: 2px solid hsla(0, 0%, 100%, 0.233) !important;
+  outline: none !important;
+  border-radius: 6px !important;
+  pointer-events: none !important;
+  max-width: min(85vh, 650px) !important;
+  width: max-content !important;
+  padding: 8px 12px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
 .rt-DropdownMenuContent,
 .rt-ContextMenuContent {
   min-width: 150px;
   padding: 8px 0 !important;
   background-color: var(--menu-bgColor) !important;
   border: 2px solid hsla(0, 0%, 100%, 0.233) !important;
+  /* pointer-events: auto !important; */
   outline: none !important;
   border-radius: 6px !important;
   margin-right: 20px;
+  /* overflow: auto !important; */
   min-width: 200px;
   z-index: 999999;
 }

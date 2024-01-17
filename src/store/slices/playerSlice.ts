@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     isError: false,
-    videoSrc: null,
     isPlaying: false,
     mediaData: {
         name: null,
@@ -17,6 +16,8 @@ const initialState = {
     currentSpeed: 1,
     isPiP: false,
     isLoading: false,
+    videoSrc: null,
+    playlist: [],
 }
 
 const playerSlice = createSlice({
