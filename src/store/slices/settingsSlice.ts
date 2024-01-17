@@ -26,6 +26,7 @@ const defaultSettings = {
     sleepMode: false,
     sleepModeDelay: 30, // in minutes
     sleepModeBehavior: "pause", // pause, quit video, close app, pc sleep, pc shutdown
+    allowRPC: true,
 }
 
 const colorCheck = (color: string) => {
@@ -56,6 +57,7 @@ const initialState = {
     sleepMode: extractLocalStorage("sleep-mode", false, "boolean"),
     sleepModeDelay: extractLocalStorage("sleep-mode-delay", 30, "number"),
     sleepModeBehavior: extractLocalStorage("sleep-mode-behavior", "pause", "string"),
+    allowRPC: extractLocalStorage("allow-rpc", true, "boolean"),
 }
 
 const settingsSlice = createSlice({
@@ -274,6 +276,18 @@ const settingsSlice = createSlice({
         updateSleepModeBehavior(state, action) {
             localStorage.setItem("sleep-mode-behavior", action.payload);
             state.sleepModeBehavior = action.payload
+        },
+        enableRPC(state) {
+            localStorage.setItem("allow-rpc", "true");
+            state.allowRPC = true
+        },
+        disableRPC(state) {
+            localStorage.setItem("allow-rpc", "false");
+            state.allowRPC = false
+        },
+        toggleRPC(state) {
+            localStorage.setItem("allow-rpc", String(!state.allowRPC));
+            state.allowRPC = !state.allowRPC
         },
         reset() {
             return initialState;

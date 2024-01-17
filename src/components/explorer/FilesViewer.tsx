@@ -71,10 +71,10 @@ const FilesViewer: FC = () => {
         return a.dir ? -1 : 1;
       }
 
-      const dateA = new Date(a.creationDate);
-      const dateB = new Date(b.creationDate);
+      const nameA = a.name.toUpperCase();
+      const nameB = b.name.toUpperCase();
 
-      return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
+      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
     });
 
     const chain: string[] = [];
@@ -113,8 +113,8 @@ const FilesViewer: FC = () => {
     handleNavigate(baseDir);
   };
 
-  const handleDelete = (dir) => {
-    fs.rmSync(dir.path, { recursive: true, force: true });
+  const handleDelete = async (dir) => {
+    await fs.promises.rmdir(dir.path, { recursive: true, force: true });
     setDirs((prev) => prev.filter((d) => d.path !== dir.path));
   };
 

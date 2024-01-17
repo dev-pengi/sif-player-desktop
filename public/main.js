@@ -6,10 +6,16 @@ const {
   shell,
   dialog,
   Tray,
-  nativeImage,
 } = require("electron");
 const { exec } = require("child_process");
 const { autoUpdater } = require("electron-updater");
+const rpc = require("discord-rpc");
+const clientId = "1197268973784400032";
+rpc.register(clientId);
+
+const rpcClient = new rpc.Client({ transport: "ipc" });
+
+rpcClient.login({ clientId }).catch(console.error);
 
 require("@electron/remote/main").initialize();
 
@@ -48,7 +54,6 @@ function createWindow() {
     private: false,
   });
 
-
   const checkForUpdates = () => {
     autoUpdater.checkForUpdates();
     autoUpdater.on("update-downloaded", (info) => {
@@ -68,6 +73,27 @@ function createWindow() {
         });
     });
   };
+
+  const startTimestamp = Date.now();
+
+  ipcMain.on("rpc", (event, args) => {
+    const activityObject = {
+      state: args?.state ?? "",
+      details: args?.details,
+      startTimestamp,
+      largeImageKey: "icon-rounded",
+      largeImageText: "Sif Player",
+      instance: false,
+    };
+    if (args?.filename) {
+      activityObject.smallImageKey = "icon-rounded";
+      activityObject.smallImageText = args?.filename;
+    }
+    rpcClient.setActivity(activityObject);
+  });
+  ipcMain.on("rpc-clear", (event, args) => {
+    rpcClient.clearActivity();
+  });
 
   win.on("maximize", () => {
     win.webContents.send("maximized");
@@ -106,9 +132,7 @@ function createWindow() {
   if (process.argv.length >= 2) {
     let filePath = process.argv[1];
 
-    console.log(filePath);
     ipcMain.on("request-file-path", (event) => {
-      console.log(filePath);
       event.sender.send("file-path", filePath);
     });
   }

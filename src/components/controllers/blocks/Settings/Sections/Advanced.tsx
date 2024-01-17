@@ -19,6 +19,7 @@ const Advanced: FC = () => {
     sleepMode,
     sleepModeDelay,
     sleepModeBehavior,
+    allowRPC,
   } = useAppSelector((state) => state.settings);
 
   const handleToggleAllowAnimations = () => {
@@ -44,6 +45,9 @@ const Advanced: FC = () => {
   };
   const handleUpdateSleepBehavior = (value: number) => {
     dispatch(settingsActions.updateSleepModeBehavior(value));
+  };
+  const handleToggleRPC = () => {
+    dispatch(settingsActions.toggleRPC());
   };
 
   return (
@@ -137,6 +141,13 @@ const Advanced: FC = () => {
           </SettingCol>
         </>
       )}
+      <Separator />
+      <SettingCol
+        title="Discord Rich Presence"
+        description="display your current playback and activity status on Discord (requires Discord desktop app installed and running)"
+      >
+        <SettingSwitch onChange={handleToggleRPC} checked={allowRPC} />
+      </SettingCol>
     </>
   );
 };

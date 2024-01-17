@@ -59,7 +59,6 @@ const useVideoSrc = () => {
         const creationTime = stats.birthtimeMs;
         const lastModified = stats.mtimeMs;
         const lastAccessed = stats.atimeMs;
-        console.log(stats);
 
         dispatch(
           playerActions.updateData({

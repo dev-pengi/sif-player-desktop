@@ -1,18 +1,24 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect } from "react";
 import { usePlayerContext } from "../../contexts";
 import MainController from "../controllers/MainController";
-import { useLoader, useTimer } from "../../hooks";
+import { useLoader, useRPC, useTimer } from "../../hooks";
 import { useAppSelector } from "../../hooks";
 import { throttle } from "lodash";
 import { useDispatch } from "react-redux";
 import { playerActions } from "../../store";
 import { DarkLayer } from "../addons";
+import { formatTime } from "../../utils";
 
 const VideoPlayer: FC = () => {
   const dispatch = useDispatch();
+  const rpc = useRPC();
   const { videoRef } = usePlayerContext();
 
-  const { videoSrc } = useAppSelector((state) => state.player);
+  const { isPlaying, videoSrc, mediaData } = useAppSelector(
+    (state) => state.player
+  );
+  const { duration, currentTime } = useAppSelector((state) => state.timer);
+  const { allowRPC } = useAppSelector((state) => state.settings);
 
   const { handleLoadStart, handleLoadEnd, handleVideoEnd } = useLoader();
   const { handleTimeUpdate } = useTimer();
@@ -31,6 +37,20 @@ const VideoPlayer: FC = () => {
   const handlePauseVideo = useCallback(() => {
     dispatch(playerActions.pause());
   }, []);
+
+  useEffect(() => {
+    if (!(mediaData.name && currentTime && duration)) return;
+    if (allowRPC)
+    {
+      rpc.set(
+        `Status: ${isPlaying ? "Playing" : "Paused"}`,
+        `Playing Media: ${formatTime(currentTime)}`,
+      mediaData.name
+      );
+    } else {
+      rpc.clear()
+    }
+  }, [isPlaying, currentTime, mediaData.name, duration, allowRPC]);
 
   return (
     <>

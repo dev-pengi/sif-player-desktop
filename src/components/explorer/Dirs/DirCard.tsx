@@ -37,7 +37,6 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const dirName = dir.name;
 
   const handleRevealInExplorer = () => {
-    console.log(pathInfo.extname);
     shell.showItemInFolder(dir.path);
   };
 

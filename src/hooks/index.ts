@@ -8,7 +8,8 @@ import useVolume from "./useVolume";
 import useClean from "./useClean";
 import useStore from "./useStore";
 import useToast from "./useToast";
+import useRPC from "./useRPC";
 import { useAppSelector } from "./useAppSelector";
 
 
-export { useErrors, useEvents, useLoader, usePlayer, useShortcuts, useTimer, useVolume, useClean, useStore, useAppSelector, useToast }
+export { useErrors, useEvents, useLoader, usePlayer, useShortcuts, useTimer, useVolume, useClean, useStore, useAppSelector, useToast, useRPC };

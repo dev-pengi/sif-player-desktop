@@ -1,12 +1,15 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { CloseIcon, DashIcon, WindowMaximizeIcon } from "../assets";
-import { useClean } from "../hooks";
+import { useAppSelector, useClean, useRPC } from "../hooks";
 import { FilesViewer } from "../components";
 
 const { ipcRenderer } = window.require("electron");
 
 const MainPage: FC = () => {
+  const rpc = useRPC();
   useClean();
+
+  const { allowRPC } = useAppSelector((state) => state.settings);
 
   const handleClose = () => {
     ipcRenderer.send("close");
@@ -17,6 +20,14 @@ const MainPage: FC = () => {
   const handleMinimize = () => {
     ipcRenderer.send("minimize");
   };
+
+  useEffect(() => {
+    if (allowRPC) {
+      rpc.set(`Browsing Files`, `Home`);
+    } else {
+      rpc.clear();
+    }
+  }, [allowRPC]);
 
   return (
     <div className="h-screen">
