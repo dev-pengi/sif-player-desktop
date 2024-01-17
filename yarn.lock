@@ -1161,7 +1161,7 @@
 
 "@radix-ui/themes@^2.0.3":
   version "2.0.3"
-  resolved "https://registry.npmjs.org/@radix-ui/themes/-/themes-2.0.3.tgz"
+  resolved "https://registry.yarnpkg.com/@radix-ui/themes/-/themes-2.0.3.tgz#c9e8f4029d73769f356dbe29c97ce3cbade601a8"
   integrity sha512-yaXQ8aWT2P1CQ0Xe6YCRD9HXsfMTvKkrIYkrc4aitCzhGTLS0sjtTqKmrxIWMVA+3DIbEuG9K/8aAMRJBhep8g==
   dependencies:
     "@radix-ui/colors" "^3.0.0"

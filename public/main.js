@@ -20,7 +20,7 @@ function createWindow() {
     width: 900,
     height: 650,
     minWidth: 900,
-    minHeight: 650,
+    minHeight: 500,
     maximizable: true,
     titleBarStyle: "hidden",
     backgroundColor: "#101010",
@@ -35,8 +35,8 @@ function createWindow() {
   });
 
   win.once("ready-to-show", () => {
-    win.show();
     win.focus();
+    win.show();
   });
 
   autoUpdater.setFeedURL({
@@ -65,6 +65,14 @@ function createWindow() {
         });
     });
   };
+
+  win.on("maximize", () => {
+    win.webContents.send("maximized");
+  });
+
+  win.on("unmaximize", () => {
+    win.webContents.send("unmaximized");
+  });
 
   checkForUpdates();
   ipcMain.on("check-update", (event) => {
