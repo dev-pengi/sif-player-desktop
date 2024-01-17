@@ -135,7 +135,7 @@ function createWindow() {
 
   let tray = null;
   app.whenReady().then(() => {
-    tray = new Tray(path.join(__dirname, "../public/icon.png"));
+    tray = new Tray(path.join(__dirname, "./icon.png"));
     const contextMenu = Menu.buildFromTemplate([
       {
         label: "Exit Application",
