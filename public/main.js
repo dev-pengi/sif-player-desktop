@@ -24,6 +24,7 @@ function createWindow() {
     maximizable: true,
     titleBarStyle: "hidden",
     backgroundColor: "#101010",
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -31,6 +32,11 @@ function createWindow() {
       enableRemoteModule: true,
       devTools: true,
     },
+  });
+
+  win.once("ready-to-show", () => {
+    win.show();
+    win.focus();
   });
 
   autoUpdater.setFeedURL({

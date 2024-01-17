@@ -8,6 +8,7 @@ import { Separator } from "../..";
 const { dialog } = window.require("@electron/remote");
 const { shell } = window.require("electron");
 const fs = window.require("fs");
+const path = window.require("path");
 
 interface DirCardProps {
   onClick: () => void;
@@ -22,17 +23,19 @@ interface DirCardProps {
 const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
   const pathInfo = fs.statSync(dir.path);
-  console.log(pathInfo);
 
   const creationTime = pathInfo.birthtime;
   const lastModified = pathInfo.mtime;
   const lastAccessed = pathInfo.atime;
   const dirSize = pathInfo.size;
-  const dirType = dir.dir ? "Folder" : videoType(pathInfo.extname);
+
+  const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
+  const dirType = dir.dir ? "Folder" : videoType(mediaType);
   const dirName = dir.name;
 
   const handleRevealInExplorer = () => {
-    shell.openItem(dir.path);
+    console.log(pathInfo.extname);
+    shell.showItemInFolder(dir.path);
   };
 
   const handleDeleteDialog = () => {

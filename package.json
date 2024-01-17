@@ -40,20 +40,38 @@
         "icon": "public/file.ico"
       },
       {
+        "ext": "mkv",
+        "name": "MKV Media",
+        "role": "Viewer",
+        "icon": "public/file.ico"
+      },
+      {
         "ext": "webm",
         "name": "WebM Media",
         "role": "Viewer",
         "icon": "public/file.ico"
       },
       {
-        "ext": "ogg",
-        "name": "OGG Media",
+        "ext": "avi",
+        "name": "AVI Media",
         "role": "Viewer",
         "icon": "public/file.ico"
       },
       {
-        "ext": "kmv",
-        "name": "MP4 Media",
+        "ext": "mov",
+        "name": "MOV Media",
+        "role": "Viewer",
+        "icon": "public/file.ico"
+      },
+      {
+        "ext": "wmv",
+        "name": "WMV Media",
+        "role": "Viewer",
+        "icon": "public/file.ico"
+      },
+      {
+        "ext": "mpg",
+        "name": "MPG Media",
         "role": "Viewer",
         "icon": "public/file.ico"
       }

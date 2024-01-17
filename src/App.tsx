@@ -1,4 +1,4 @@
-import { Routes, Route, HashRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { MainPage, PlayerPage } from "./pages";
 import { Theme } from "@radix-ui/themes";
 import "react-contexify/dist/ReactContexify.css";
@@ -23,12 +23,17 @@ function App() {
       if (!findPath) return;
       const isVideo = findExt.includes(fileCheck.ext.slice(1));
       if (!isVideo) return;
-      
+      const mediaParent = path.dirname(filePath);
+      localStorage.setItem("last-dir", mediaParent);
       navigate(`/player?src=${filePath}&type=file`);
     });
   };
   useEffect(() => {
     requestOpenedFilePath();
+
+    return () => {
+      ipcRenderer.removeAllListeners("file-path");
+    };
   }, []);
   return (
     <Theme>
