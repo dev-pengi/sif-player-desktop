@@ -6,6 +6,8 @@ import { ActivityIndicator } from "../spins";
 import DirCard from "./Dirs/DirCard";
 import { useHotkeys } from "react-hotkeys-hook";
 
+const { dialog } = window.require("@electron/remote");
+
 const path = window.require("path");
 const fs = window.require("fs");
 const os = window.require("os");
@@ -114,8 +116,30 @@ const FilesViewer: FC = () => {
   };
 
   const handleDelete = async (dir) => {
-    await fs.promises.rmdir(dir.path, { recursive: true, force: true });
-    setDirs((prev) => prev.filter((d) => d.path !== dir.path));
+    try {
+      if (dir.dir) {
+        await fs.promises.rmdir(dir.path, { recursive: true, force: true });
+      } else {
+        await fs.promises.unlink(dir.path);
+      }
+      setDirs((prev) => prev.filter((d) => d.path !== dir.path));
+    } catch (error) {
+      console.error(error);
+      dialog
+        .showMessageBox({
+          type: "error",
+          title: "Sif Player",
+          message: `Failed to delete (${dir.name})`,
+          buttons: ["retry", "cancel"],
+          detail: error.message,
+          noLink: true,
+        })
+        .then((res) => {
+          if (res.response === 0) {
+            handleDelete(dir);
+          }
+        });
+    }
   };
 
   useHotkeys("backspace", handleBack, { keyup: true });
