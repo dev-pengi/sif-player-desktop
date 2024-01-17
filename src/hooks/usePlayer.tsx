@@ -10,7 +10,6 @@ const usePlayer = () => {
   const dispatch = useDispatch();
   const { isPlaying } = useAppSelector((state) => state.player);
   const { videoRef } = usePlayerContext();
-  const { controllersDeps } = useAppSelector(state => state.controls);
 
   const { handleStoreData } = useStore();
 

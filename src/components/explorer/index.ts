@@ -1,3 +1,4 @@
-import DirChain from "./DirChain";
+import DirChain from "./Dirs/DirChain";
+import FilesViewer from "./FilesViewer";
 
-export default DirChain;
+export { DirChain, FilesViewer };

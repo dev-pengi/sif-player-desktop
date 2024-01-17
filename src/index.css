@@ -23,14 +23,16 @@
   --activeItem-color: #fff;
   --activeItem-bgColor: #4d4d4d96;
 }
-.rt-DropdownMenuViewport {
+.rt-DropdownMenuViewport,
+.rt-ContextMenuViewport {
   padding: 0px 0 !important;
   border: none !important;
   outline: none !important;
   border-radius: 0px !important;
   z-index: 999999;
 }
-.rt-DropdownMenuContent {
+.rt-DropdownMenuContent,
+.rt-ContextMenuContent {
   min-width: 150px;
   padding: 8px 0 !important;
   background-color: var(--menu-bgColor) !important;
@@ -42,40 +44,47 @@
   z-index: 999999;
 }
 
-.rt-DropdownMenuItem {
+.rt-DropdownMenuItem,
+.rt-ContextMenuItem {
   border-radius: 0 !important;
   padding: 21px 18px !important;
   font-size: 16px !important;
   cursor: pointer !important;
   background-color: transparent !important;
 }
+.rt-ContextMenuItem[data-accent-color="red"],
 .rt-DropdownMenuItem[data-accent-color="red"] {
   color: #ff2a2a !important;
 }
-.rt-DropdownMenuItem[data-accent-color="red"][data-highlighted] {
-  background-color: rgba(237, 76, 92, 1) !important;
+.rt-DropdownMenuItem[data-accent-color="red"][data-highlighted],
+.rt-ContextMenuItem[data-accent-color="red"][data-highlighted] {
+  background-color: #ff2a2a !important;
   color: #eeeeee !important;
 }
 .rt-DropdownMenuItem:hover,
-.rt-DropdownMenuItem[data-highlighted] {
+.rt-DropdownMenuItem[data-highlighted],
+.rt-ContextMenuItem:hover,
+.rt-ContextMenuItem[data-highlighted] {
   background-color: var(--activeItem-bgColor) !important;
   color: var(--activeItem-color) !important;
 }
 
-.rt-DropdownMenuItem[data-accent-color="red"]:hover {
-  background-color: rgba(237, 76, 92, 1) !important;
+.rt-DropdownMenuItem[data-accent-color="red"]:hover,
+.rt-ContextMenuItem[data-accent-color="red"]:hover {
+  background-color: #ff2a2a !important;
   color: #eeeeee !important;
 }
 .rt-BaseMenuSeparator {
   background-color: var(--separator-color) !important;
-
   margin: 8px 0 !important;
 }
-.rt-DropdownMenuItem:hover {
+.rt-DropdownMenuItem:hover,
+.rt-ContextMenuItem:hover {
   background-color: var(--gray-4);
   color: var(--dark);
 }
-.rt-DropdownMenuItem[data-highlighted] {
+.rt-DropdownMenuItem[data-highlighted],
+.rt-ContextMenuItem[data-highlighted] {
   background-color: var(--gray-4);
   color: var(--dark);
 }
@@ -111,7 +120,7 @@ a {
 }
 
 body {
-  background-color: var(--dark) !important;
+  background-color: #000000 !important;
   color: var(--white);
   overflow-x: hidden !important;
   pointer-events: auto !important;

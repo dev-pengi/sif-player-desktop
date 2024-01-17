@@ -15,6 +15,7 @@ const useClean = () => {
     dispatch(volumeActions.reset());
     dispatch(playerActions.reset());
     dispatch(controlsActions.reset());
+    if (document.fullscreenElement) document.exitFullscreen();
   }, []);
 };
 

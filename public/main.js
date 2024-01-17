@@ -5,6 +5,7 @@ const {
   ipcMain,
   shell,
   dialog,
+  Tray,
 } = require("electron");
 const { exec } = require("child_process");
 const { autoUpdater } = require("electron-updater");
@@ -131,14 +132,28 @@ function createWindow() {
       exec("pmset sleepnow");
     }
   });
+
+  let tray = null;
+  app.whenReady().then(() => {
+    tray = new Tray(path.join(__dirname, "../public/icon.png"));
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Exit Application",
+        type: "normal",
+        click: () => {
+          app.quit();
+        },
+      },
+    ]);
+    tray.setToolTip("Sif Player");
+    tray.setContextMenu(contextMenu);
+  });
 }
 
 app.on("ready", createWindow);
 
 app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on("activate", function () {

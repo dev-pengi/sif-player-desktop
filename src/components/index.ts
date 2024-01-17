@@ -1,5 +1,6 @@
 import VideoPicker from "./VideoPicker";
 import Player from "./Player";
-import DirChain from "./explorer";
+import { FilesViewer } from "./explorer";
+import Separator from "./Separator";
 
-export { VideoPicker, Player, DirChain };
+export { VideoPicker, Player, FilesViewer, Separator };
