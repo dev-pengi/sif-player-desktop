@@ -90,4 +90,15 @@ const videoType = (type) => {
     }
 };
 
-export { formatTime, formatResolution, formatBytes, videoType, formatDate };
+const separateText = (text: string, separator?: string, separateSymbols?: string[]) => {
+    separator = separator || " ";
+    separateSymbols = separateSymbols || ["-", "_", ".", ","];
+    let newText = text;
+    separateSymbols.forEach((symbol) => {
+        newText = newText.split(symbol).join(separator);
+    });
+    return newText;
+}
+
+
+export { formatTime, formatResolution, formatBytes, videoType, formatDate, separateText };

@@ -7,7 +7,7 @@ import { throttle } from "lodash";
 import { useDispatch } from "react-redux";
 import { playerActions } from "../../store";
 import { DarkLayer } from "../addons";
-import { formatTime } from "../../utils";
+import { formatTime, separateText } from "../../utils";
 
 const VideoPlayer: FC = () => {
   const dispatch = useDispatch();
@@ -40,15 +40,14 @@ const VideoPlayer: FC = () => {
 
   useEffect(() => {
     if (!(mediaData.name && currentTime && duration)) return;
-    if (allowRPC)
-    {
+    if (allowRPC) {
       rpc.set(
         `Status: ${isPlaying ? "Playing" : "Paused"}`,
         `Playing Media: ${formatTime(currentTime)}`,
-      mediaData.name
+        separateText(mediaData.name)
       );
     } else {
-      rpc.clear()
+      rpc.clear();
     }
   }, [isPlaying, currentTime, mediaData.name, duration, allowRPC]);
 

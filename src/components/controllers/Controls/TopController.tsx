@@ -3,11 +3,11 @@ import { BackButton, MenuButton } from "../Buttons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppSelector, usePlayer } from "../../../hooks";
 import { CloseIcon, DashIcon, WindowMaximizeIcon } from "../../../assets";
+import { separateText } from "../../../utils";
 const { ipcRenderer } = window.require("electron");
 
 const TopController: FC = () => {
   const { mediaData } = useAppSelector((state) => state.player);
-  const { allowAnimations } = useAppSelector((state) => state.settings);
   const { isLocked, controllersDeps, isFullscreen } = useAppSelector(
     (state) => state.controls
   );
@@ -54,7 +54,9 @@ const TopController: FC = () => {
                   <div className="relative ml-3 flex items-center justify-center">
                     <MenuButton />
                   </div>
-                  <p className="ml-3 truncate break-words">{videoName}</p>
+                  <p className="ml-3 truncate break-words">
+                    {separateText(videoName)}
+                  </p>
                 </div>
               </div>
             </div>
