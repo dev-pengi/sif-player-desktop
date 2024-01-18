@@ -43,7 +43,7 @@ const VideoPlayer: FC = () => {
     if (allowRPC) {
       rpc.set(
         `Status: ${isPlaying ? "Playing" : "Paused"}`,
-        `Playing Media: ${formatTime(currentTime)}`,
+        `Playing Media: ${formatTime(currentTime)}/${formatTime(duration)}`,
         separateText(mediaData.name)
       );
     } else {

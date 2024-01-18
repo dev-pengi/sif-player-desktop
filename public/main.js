@@ -84,6 +84,16 @@ function createWindow() {
       largeImageKey: "icon-rounded",
       largeImageText: "Sif Player",
       instance: false,
+      buttons: [
+        {
+          label: "Download Sif Player",
+          url: "player.sifedine.com/desktop",
+        },
+        {
+          label: "Use Sif Player Online",
+          url: "player.sifedine.com",
+        },
+      ],
     };
     if (args?.filename) {
       activityObject.smallImageKey = "icon-rounded";
