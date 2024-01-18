@@ -87,11 +87,11 @@ function createWindow() {
       buttons: [
         {
           label: "Download Sif Player",
-          url: "player.sifedine.com/desktop",
+          url: "https://player.sifedine.com/desktop",
         },
         {
           label: "Use Sif Player Online",
-          url: "player.sifedine.com",
+          url: "https://player.sifedine.com",
         },
       ],
     };
