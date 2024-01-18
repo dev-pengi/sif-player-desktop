@@ -55,25 +55,21 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
         }
       });
   };
-
   const handleThumbnail = async () => {
     if (dir.dir) return;
-    nativeImage
-      .createThumbnailFromPath(dir.path, { width: 256, height: 256 })
-      .then((img) => {
-        const buffer = img.toPNG();
-        const blob = new Blob([buffer], { type: "image/png" });
-        const thumbnailBlob = URL.createObjectURL(blob);
-        setThumbnail(thumbnailBlob);
-      })
-      .catch((err) => {
-        console.log(err);
+    try {
+      const img = await nativeImage.createThumbnailFromPath(dir.path, {
+        width: 256,
+        height: 256,
       });
+      const buffer = img.toPNG();
+      const blob = new Blob([buffer], { type: "image/png" });
+      const thumbnailBlob = URL.createObjectURL(blob);
+      setThumbnail(thumbnailBlob);
+    } catch (err) {
+      console.log(err);
+    }
   };
-
-  useEffect(() => {
-    handleThumbnail();
-  }, []);
 
   return (
     <>
@@ -86,16 +82,23 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
             {!dir.dir && (
               <HoverCard.Root>
                 <HoverCard.Trigger>
-                  <div className="absolute top-0 left-0 w-full h-full z-10" />
+                  <div
+                    onMouseEnter={() => {
+                      handleThumbnail();
+                    }}
+                    className="absolute top-0 left-0 w-full h-full z-10"
+                  />
                 </HoverCard.Trigger>
                 <HoverCard.Content side="top">
                   <div className="flex items-start gap-5">
-                    {thumbnail && (
-                      <img
-                        src={thumbnail}
-                        className="bg-[#ffffff21] min-w-[160px] min-h-[100px] max-w-[160px] max-h-[100px] rounded-md object-cover"
-                      />
-                    )}
+                    <div className="bg-[#ffffff21] min-w-[160px] min-h-[100px] max-w-[160px] max-h-[100px] rounded-md ">
+                      {thumbnail && (
+                        <img
+                          src={thumbnail}
+                          className="min-w-[160px] min-h-[100px] max-w-[160px] max-h-[100px] rounded-md object-cover"
+                        />
+                      )}
+                    </div>
                     <div className="max-w-[calc(100%-180px)]">
                       <h3 className="text-[14px] break-words font-bold opacity-80 line-clamp-3">
                         {dirName}
