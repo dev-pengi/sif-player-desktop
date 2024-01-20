@@ -7,16 +7,14 @@ import { useAppSelector } from ".";
 
 const useEvents = () => {
   const dispatch = useDispatch();
-  const toast = useToast();
 
   const [isBackgroundPause, setIsBackgroundPause] = useState(false);
 
   const { videoRef } = usePlayerContext();
-  const { isPlaying, isPiP } = useAppSelector((state) => state.player);
-  const { playInBackground, isLoop } = useAppSelector(
-    (state) => state.settings
+  const { isPlaying, isPiP, mediaData, videoSrc } = useAppSelector(
+    (state) => state.player
   );
-  const { volume, isMuted } = useAppSelector((state) => state.volume);
+  const { playInBackground } = useAppSelector((state) => state.settings);
   const { duration, currentTime } = useAppSelector((state) => state.timer);
 
   const { handlePause, handlePlay } = usePlayer();
@@ -80,19 +78,6 @@ const useEvents = () => {
   };
 
   useEffect(() => {
-    const storeInterval = setInterval(() => {
-      if (!duration || !videoRef.current) return;
-      handleStoreData({
-        time: videoRef.current.currentTime,
-      });
-    }, 500);
-
-    return () => {
-      clearInterval(storeInterval);
-    };
-  }, [duration]);
-
-  useEffect(() => {
     const bufferedPercentage = calculateBufferedPercentage();
     dispatch(timerActions.buffer(bufferedPercentage));
   }, [currentTime]);
@@ -122,7 +107,6 @@ const useEvents = () => {
       window.removeEventListener("focus", handleFocus);
     };
   }, [playInBackground, isBackgroundPause, isPlaying]);
-
 };
 
 export default useEvents;

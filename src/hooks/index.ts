@@ -12,4 +12,4 @@ import useRPC from "./useRPC";
 import { useAppSelector } from "./useAppSelector";
 
 
-export { useErrors, useEvents, useLoader, usePlayer, useShortcuts, useTimer, useVolume, useClean, useStore, useAppSelector, useToast, useRPC };
+export { useErrors, useEvents, useLoader, usePlayer, useShortcuts, useTimer, useVolume, useClean, useStore, useAppSelector, useToast, useRPC, };

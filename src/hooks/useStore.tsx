@@ -1,12 +1,12 @@
 import { useAppSelector } from ".";
 
 const useStore = () => {
-  const { mediaData } = useAppSelector((state) => state.player);
-  const handleStoreData = (newData: any) => {
-    const videoName = mediaData?.name || null;
-    const videoUrl = mediaData?.url || null;
-
-    if (!videoUrl && !videoName) return;
+  const handleStoreData = (
+    name: string = null,
+    url: string = null,
+    newData: any
+  ) => {
+    if (!url && !name) return;
 
     let data = [];
     const storedData = localStorage.getItem("data");
@@ -21,21 +21,20 @@ const useStore = () => {
 
     const existingVideoIndex = data.findIndex(
       (video: any) =>
-        (video.url && video.url === videoUrl) ||
-        (video.name && video.name === videoName)
+        (video.url && video.url === url) || (video.name && video.name === name)
     );
 
     if (existingVideoIndex !== -1) {
       data[existingVideoIndex] = {
         ...data[existingVideoIndex],
-        url: videoUrl,
-        name: videoName,
+        url,
+        name,
         ...newData,
       };
     } else {
       data.push({
-        url: videoUrl,
-        name: videoName,
+        url,
+        name,
         ...newData,
       });
     }
@@ -43,14 +42,11 @@ const useStore = () => {
     localStorage.setItem("data", JSON.stringify(data));
   };
 
-  const handleFetchData = () => {
-    const videoName = mediaData?.name || null;
-    const videoUrl = mediaData?.url || null;
+  const handleFetchData = (name: string = null, url: string = null) => {
     const storedData = JSON.parse(localStorage.getItem("data") || "[]");
     const filteredData = storedData.filter((video: any) => {
       return (
-        (video.url && video.url === videoUrl) ||
-        (video.name && video.name === videoName)
+        (video.url && video.url === url) || (video.name && video.name === name)
       );
     });
 

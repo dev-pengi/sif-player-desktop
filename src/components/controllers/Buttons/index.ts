@@ -4,5 +4,6 @@ import FullScreenButton from "./FullScreenToggle";
 import BackButton from "./BackButton";
 import PlayBackSpeed from "./PlayBackSpeed";
 import MenuButton from "./MenuButton";
+import PlaylistControls from "./PlaylistControls";
 
-export { PlayToggle, VolumeSlider, FullScreenButton, BackButton, PlayBackSpeed, MenuButton };
+export { PlayToggle, VolumeSlider, FullScreenButton, BackButton, PlayBackSpeed, MenuButton, PlaylistControls };

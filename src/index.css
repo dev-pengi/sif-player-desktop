@@ -38,11 +38,22 @@
   border: 2px solid hsla(0, 0%, 100%, 0.233) !important;
   outline: none !important;
   border-radius: 6px !important;
-  pointer-events: none !important;
-  max-width: min(85vh, 650px) !important;
+  max-width: min(85vw, 650px) !important;
   width: max-content !important;
   padding: 8px 12px !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
+  pointer-events: none !important;
+}
+
+.rt-PopoverContent {
+  z-index: 999999;
+  background-color: var(--menu-bgColor) !important;
+  border: 2px solid hsla(0, 0%, 100%, 0.233) !important;
+  outline: none !important;
+  border-radius: 6px !important;
+  width: max-content !important;
+  padding: 8px 12px !important;
   box-sizing: border-box !important;
 }
 

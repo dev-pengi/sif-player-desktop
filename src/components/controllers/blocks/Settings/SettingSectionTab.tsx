@@ -29,7 +29,7 @@ const SettingSectionTab: FC<SettingSectionTabProps> = ({
       }}
       ref={tabRef}
       className={`relative px-3 py-1.5 ${
-        isActive ? `text-${primaryColor}` : "text-neutral-400"
+        isActive ? `text-white` : "text-neutral-400"
       } hover:text-neutral-100 cursor-pointer rounded-md text-[15px]`}
       onClick={() => {
         onSelect();

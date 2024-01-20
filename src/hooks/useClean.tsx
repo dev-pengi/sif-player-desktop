@@ -6,9 +6,11 @@ import {
   timerActions,
   volumeActions,
 } from "../store";
+import { useAppSelector } from ".";
 
 const useClean = () => {
   const dispatch = useDispatch();
+  // const { mediaData, videoSrc } = useAppSelector((state) => state.player);
 
   useEffect(() => {
     dispatch(timerActions.reset());

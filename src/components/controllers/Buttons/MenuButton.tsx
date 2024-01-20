@@ -12,7 +12,7 @@ import { settingsActions } from "../../../store";
 
 const MenuButton: FC = () => {
   const dispatch = useDispatch();
-  const { primaryColor, isLoop, shortcutsEnabled } = useAppSelector(
+  const { primaryColor, isLoop, autoPlay } = useAppSelector(
     (state) => state.settings
   );
 
@@ -28,8 +28,8 @@ const MenuButton: FC = () => {
   const handleLoopToggle = () => {
     dispatch(settingsActions.toggleLoop());
   };
-  const handleShortcutsToggle = () => {
-    dispatch(settingsActions.toggleShortcuts());
+  const handleAutoPlayToggle = () => {
+    dispatch(settingsActions.toggleAutoPlay());
   };
 
   const handleSettingsOpen = () => {
@@ -88,13 +88,13 @@ const MenuButton: FC = () => {
           <DropdownMenu.Item
             onSelect={(event) => {
               event.preventDefault();
-              handleShortcutsToggle();
+              handleAutoPlayToggle();
             }}
           >
-            <p>Enable Shortcuts</p>
+            <p>Auto play</p>
             <Switch
-              onChange={handleShortcutsToggle}
-              checked={shortcutsEnabled}
+              onChange={handleAutoPlayToggle}
+              checked={autoPlay}
               uncheckedIcon={false}
               checkedIcon={false}
               onColor={primaryColor}

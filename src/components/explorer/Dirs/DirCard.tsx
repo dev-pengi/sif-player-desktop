@@ -27,9 +27,9 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const pathInfo = fs.statSync(dir.path);
 
-  const creationTime = pathInfo.birthtime;
-  const lastModified = pathInfo.mtime;
-  const lastAccessed = pathInfo.atime;
+  const creationTime = formatDate(pathInfo.birthtime);
+  const lastModified = formatDate(pathInfo.mtime);
+  const lastAccessed = formatDate(pathInfo.atime);
   const dirSize = pathInfo.size;
 
   const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
@@ -56,7 +56,7 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
       });
   };
   const handleThumbnail = async () => {
-    if (dir.dir) return;
+    if (dir.dir || thumbnail) return;
     try {
       const img = await nativeImage.createThumbnailFromPath(dir.path, {
         width: 256,
@@ -67,7 +67,7 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
       const thumbnailBlob = URL.createObjectURL(blob);
       setThumbnail(thumbnailBlob);
     } catch (err) {
-      console.log(err);
+      return;
     }
   };
 
@@ -103,7 +103,9 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
                       <h3 className="text-[14px] break-words font-bold opacity-80 line-clamp-3">
                         {dirName}
                       </h3>
-                      <p className="text-[12px] mt-3">{dirType}</p>
+
+                      <p className="text-[12px] mt-3">{creationTime}</p>
+                      <p className="text-[12px]">{dirType}</p>
                       <p className="text-[12px]">{formatBytes(dirSize)}</p>
                     </div>
                   </div>
@@ -181,17 +183,17 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
 
           <div className="flex items-center py-2">
             <h3 className="opacity-95">Created:</h3>
-            <p className="ml-6 opacity-80">{formatDate(creationTime)}</p>
+            <p className="ml-6 opacity-80">{creationTime}</p>
           </div>
 
           <div className="flex items-center py-2">
             <h3 className="opacity-95">Modified:</h3>
-            <p className="ml-6 opacity-80">{formatDate(lastModified)}</p>
+            <p className="ml-6 opacity-80">{lastModified}</p>
           </div>
 
           <div className="flex items-center py-2">
             <h3 className="opacity-95">Accessed:</h3>
-            <p className="ml-6 opacity-80">{formatDate(lastAccessed)}</p>
+            <p className="ml-6 opacity-80">{lastAccessed}</p>
           </div>
         </>
       </Modal>

@@ -20,5 +20,8 @@ import FolderIcon from "./FolderIcon";
 import FileIcon from "./FileIcon";
 import HomeIcon from "./HomeIcon";
 import Unmaximize from "./Unmaximize";
+import PlayListIcon from "./PlayListIcon";
+import NextIcon from "./NextIcon";
+import PreviousIcon from "./PreviousIcon";
 
-export { PlayIcon, PauseIcon, MaximizeIcon, MinimizeIcon, MaxSoundIcon, MinSoundIcon, MuteSoundIcon, BackIcon, PlaybackSpeedIcon, CheckIcon, LinkIcon, MenuIcon, LockIcon, UnlockIcon, CloseIcon, DownIcon, WindowMaximizeIcon, DashIcon, FolderIcon, FileIcon, HomeIcon, Unmaximize };
+export { PlayIcon, PauseIcon, MaximizeIcon, MinimizeIcon, MaxSoundIcon, MinSoundIcon, MuteSoundIcon, BackIcon, PlaybackSpeedIcon, CheckIcon, LinkIcon, MenuIcon, LockIcon, UnlockIcon, CloseIcon, DownIcon, WindowMaximizeIcon, DashIcon, FolderIcon, FileIcon, HomeIcon, Unmaximize, PlayListIcon, NextIcon, PreviousIcon };

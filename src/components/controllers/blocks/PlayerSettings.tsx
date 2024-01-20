@@ -3,7 +3,6 @@ import {
   Accessability,
   Advanced,
   Appearance,
-  General,
   Preferences,
 } from "./Settings/Sections";
 import SettingSectionTab from "./Settings/SettingSectionTab";
@@ -16,10 +15,6 @@ interface Tab {
 }
 
 const tabs: Tab[] = [
-  {
-    title: "General",
-    section: <General />,
-  },
   {
     title: "Preferences",
     section: <Preferences />,
@@ -42,8 +37,6 @@ const tabs: Tab[] = [
 const CurrentSection = ({ sectionsTabs, activeTab }) => {
   return sectionsTabs[activeTab].section;
 };
-
-
 
 const SettingsBlock: FC = () => {
   const [activeTab, setActiveTab] = useState(0);

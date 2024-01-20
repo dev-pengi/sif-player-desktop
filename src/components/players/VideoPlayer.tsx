@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect } from "react";
 import { usePlayerContext } from "../../contexts";
 import MainController from "../controllers/MainController";
-import { useLoader, useRPC, useTimer } from "../../hooks";
+import { useLoader, useRPC, useStore, useTimer } from "../../hooks";
 import { useAppSelector } from "../../hooks";
 import { throttle } from "lodash";
 import { useDispatch } from "react-redux";
@@ -12,15 +12,18 @@ import { formatTime, separateText } from "../../utils";
 const VideoPlayer: FC = () => {
   const dispatch = useDispatch();
   const rpc = useRPC();
+
   const { videoRef } = usePlayerContext();
 
-  const { isPlaying, videoSrc, mediaData } = useAppSelector(
+  const { handleStoreData } = useStore();
+  const { handleLoadStart, handleLoadEnd, handleVideoEnd } = useLoader();
+
+  const { isPlaying, videoSrc, mediaData, isImporting } = useAppSelector(
     (state) => state.player
   );
   const { duration, currentTime } = useAppSelector((state) => state.timer);
   const { allowRPC } = useAppSelector((state) => state.settings);
 
-  const { handleLoadStart, handleLoadEnd, handleVideoEnd } = useLoader();
   const { handleTimeUpdate } = useTimer();
 
   const handlePlayerTimeUpdate = useCallback(
@@ -51,6 +54,21 @@ const VideoPlayer: FC = () => {
     }
   }, [isPlaying, currentTime, mediaData.name, duration, allowRPC]);
 
+  useEffect(() => {
+    const storeInterval = setInterval(() => {
+      if (!videoRef.current || isImporting) return;
+      handleStoreData(null, videoSrc, {
+        time: videoRef.current.currentTime,
+      });
+    }, 500);
+
+    return () => {
+      clearInterval(storeInterval);
+    };
+  }, [videoSrc, isImporting]);
+
+  useEffect(() => {}, [videoSrc]);
+
   return (
     <>
       {videoSrc && (
@@ -60,9 +78,9 @@ const VideoPlayer: FC = () => {
           src={videoSrc}
           onError={handleLoadStart}
           onLoadStart={handleLoadStart}
-          onWaiting={handleLoadStart}
-          onPlaying={handleLoadEnd}
           onLoadedData={handleLoadEnd}
+          onWaiting={() => dispatch(playerActions.loading())}
+          onPlaying={() => dispatch(playerActions.loaded())}
           onTimeUpdate={handlePlayerTimeUpdate}
           onPlay={handlePlayVideo}
           onPause={handlePauseVideo}

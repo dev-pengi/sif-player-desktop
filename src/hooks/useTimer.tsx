@@ -6,28 +6,36 @@ import { useAppSelector } from ".";
 const useTimer = () => {
   const dispatch = useDispatch();
   const { videoRef } = usePlayerContext();
-  const { duration, currentTime } = useAppSelector((state) => state.timer);
 
   const handleSeek = (time: number) => {
     if (!videoRef?.current) return;
-    const clampedTime = Math.max(0, Math.min(time, duration));
+    const clampedTime = Math.max(0, Math.min(time, videoRef.current.duration));
     dispatch(timerActions.update(clampedTime));
     videoRef.current.currentTime = clampedTime;
   };
 
   const handleSkipForward = (amount: number) => {
-    const newTime = Math.max(0, Math.min(currentTime + amount, duration));
+    if (!videoRef?.current) return;
+    const newTime = Math.max(
+      0,
+      Math.min(videoRef.current.currentTime + amount, videoRef.current.duration)
+    );
     dispatch(timerActions.update(newTime));
     videoRef.current.currentTime = newTime;
   };
 
   const handleSkipBackward = (amount: number) => {
-    const newTime = Math.max(0, Math.min(currentTime - amount, duration));
+    if (!videoRef?.current) return;
+    const newTime = Math.max(
+      0,
+      Math.min(videoRef.current.currentTime - amount, videoRef.current.duration)
+    );
     dispatch(timerActions.update(newTime));
     videoRef.current.currentTime = newTime;
   };
 
   const handleTimeUpdate = () => {
+    if (!videoRef?.current) return;
     const time = videoRef.current.currentTime;
     dispatch(timerActions.update(time));
   };

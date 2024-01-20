@@ -21,6 +21,8 @@ const useVideoSrc = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
+  const { playlist, videoIndex } = useAppSelector((state) => state.player);
+
   useEffect(() => {
     const handleVideoSrc = async () => {
       const queryParams = new URLSearchParams(location.search);
@@ -50,8 +52,11 @@ const useVideoSrc = () => {
         dispatch(playerActions.updateData({ name, url, size, type }));
         controller.abort();
       } else if (playType === "file") {
-        const url = src;
+        const url = playlist[videoIndex];
+        if (!url) return;
+        dispatch(playerActions.source(url));
         const file = path.parse(url);
+
         const stats = await fs.promises.stat(url);
         const size = stats.size;
         const type = `video/${file.ext.slice(1)}`;
@@ -71,44 +76,19 @@ const useVideoSrc = () => {
             lastAccessed,
           })
         );
-        dispatch(playerActions.source(url));
       }
     };
 
     handleVideoSrc();
-  }, []);
+  }, [location.search, playlist, videoIndex]);
 };
 
 const Player: FC = () => {
-  const { saveTrack, saveAdjustments } = useAppSelector(
-    (state) => state.settings
-  );
-  const { handleSeek } = useTimer();
-  const { handleVolumeChange } = useVolume();
-  const { handlePlaybackSpeedUpdate } = usePlayer();
-  const { mediaData, isError } = useAppSelector((state) => state.player);
-  const { duration } = useAppSelector((state) => state.timer);
+  const { isError } = useAppSelector((state) => state.player);
   useVideoSrc();
   useEvents();
   useShortcuts();
   useErrors();
-
-  const { handleFetchData } = useStore();
-
-  useEffect(() => {
-    const data = handleFetchData();
-    if (data) {
-      const { time, volume, muted, speed } = data;
-      if (time && !isNaN(time) && saveTrack) handleSeek(Math.round(time));
-      if (saveAdjustments) {
-        if (volume && !isNaN(volume)) {
-          handleVolumeChange(volume);
-          if (muted) handleVolumeChange(0);
-        }
-        if (speed && !isNaN(speed)) handlePlaybackSpeedUpdate(speed);
-      }
-    }
-  }, [mediaData?.name, mediaData?.url, duration]);
 
   return (
     <div className="w-screen h-screen flex items-center justify-center flex-1 bg-black">

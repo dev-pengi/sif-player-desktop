@@ -46,7 +46,7 @@ const CenterController: FC = () => {
             transition={{
               duration: allowAnimations ? 0.1 : 0,
             }}
-            className="text-[22px]"
+            className="text-[22px] absolute w-max h-max top-0 bottom-0 left-0 right-0 m-auto"
           >
             <ActivityIndicator />
           </motion.div>

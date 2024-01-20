@@ -6,11 +6,15 @@ import "@radix-ui/themes/styles.css";
 import { useAppSelector } from "./hooks";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { formats } from "./constants";
+import { useDispatch } from "react-redux";
+import { playerActions } from "./store";
 const { ipcRenderer } = window.require("electron");
 const fs = window.require("fs");
 const path = window.require("path");
 
 function App() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { primaryColor } = useAppSelector((state) => state.settings);
 
@@ -18,16 +22,17 @@ function App() {
     ipcRenderer.send("request-file-path");
     ipcRenderer.on("file-path", async (event, filePath) => {
       const fileCheck = path.parse(filePath);
-      const findExt = ["mp4", "mkv", "webm", "avi", "mov", "wmv", "mpg", "ogg"];
       const findPath = await fs.promises.readdir(fileCheck.dir);
       if (!findPath) return;
-      const isVideo = findExt.includes(fileCheck.ext.slice(1));
+      const isVideo = formats.includes(fileCheck.ext.slice(1));
       if (!isVideo) return;
       const mediaParent = path.dirname(filePath);
       localStorage.setItem("last-dir", mediaParent);
-      navigate(`/player?src=${filePath}&type=file`);
+      dispatch(playerActions.updatePlaylist([findPath]));
+      navigate(`/player?type=file`);
     });
   };
+
   useEffect(() => {
     requestOpenedFilePath();
 
@@ -35,6 +40,7 @@ function App() {
       ipcRenderer.removeAllListeners("file-path");
     };
   }, []);
+
   return (
     <Theme>
       <style>

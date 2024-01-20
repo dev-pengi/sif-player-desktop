@@ -5,6 +5,7 @@ import {
   FullScreenButton,
   VolumeSlider,
   PlayBackSpeed,
+  PlaylistControls,
 } from "../Buttons";
 import { formatTime } from "../../../utils";
 import TrackSlider from "../Track/TrackSlider";
@@ -40,8 +41,8 @@ const BottomController: FC = () => {
           className="relative flex w-full items-center px-12 h-[80px] flex-col"
         >
           <TrackSlider />
-          <div className="flex justify-between w-full mt-2">
-            <div className="relative flex items-center justify-center">
+          <div className="flex justify-center w-full mt-2">
+            <div className="relative flex items-center justify-start flex-1">
               <PlayToggle />
               <div className="ml-[14px]">
                 <LockButton />
@@ -50,12 +51,22 @@ const BottomController: FC = () => {
                 <div className="ml-3">
                   <VolumeSlider />
                 </div>
-                <motion.p layout className="drop-shadow-2xl ml-4">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </motion.p>
+                <motion.div layout className="ml-3">
+                  <motion.p
+                    transition={{
+                      duration: 0,
+                    }}
+                    layout
+                    className="drop-shadow-2xl"
+                  >
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </motion.p>
+                </motion.div>
               </LayoutGroup>
             </div>
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center"></div>
+            <div className="relative flex items-center justify-end flex-1">
+              <PlaylistControls />
               <PlayBackSpeed />
               <div className="ml-3">
                 <FullScreenButton />

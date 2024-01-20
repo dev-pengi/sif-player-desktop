@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { ActivityIndicator } from "../spins";
 import DirCard from "./Dirs/DirCard";
 import { useHotkeys } from "react-hotkeys-hook";
+import { formats } from "../../constants";
+import { playerActions } from "../../store";
+import { useDispatch } from "react-redux";
 
 const { dialog } = window.require("@electron/remote");
 
@@ -13,6 +16,7 @@ const fs = window.require("fs");
 const os = window.require("os");
 
 const FilesViewer: FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
@@ -33,12 +37,10 @@ const FilesViewer: FC = () => {
       withFileTypes: true,
     });
 
-    const videoFormats = ["mp4", "ogg", "mkv", "webm"];
     const dirs_files: any[] = [];
 
     for (const dirent of dirents) {
       const res = path.resolve(currentDir, dirent.name);
-
       try {
         const dirStat = await fs.promises.stat(res);
 
@@ -52,7 +54,7 @@ const FilesViewer: FC = () => {
           });
         } else {
           const ext = path.extname(dirent.name).slice(1);
-          if (videoFormats.includes(ext)) {
+          if (formats.includes(ext)) {
             dirs_files.push({
               name: dirent.name,
               dir: false,
@@ -146,55 +148,70 @@ const FilesViewer: FC = () => {
   useHotkeys("f5", () => fetchFiles(), { keyup: true });
 
   return (
-    <div className="h-full w-full overflow-y-auto min-scrollbar">
-      <div className="py-3 px-3 flex items-center">
-        {path.dirname(currentDir) !== currentDir && (
-          <button
-            onClick={handleBack}
-            className="bg-[#ffffff16] flex items-center px-1.5 py-1.5 text-[20px] rounded-md"
-          >
-            <BackIcon />
-          </button>
-        )}
-        <DirChain
-          dirsChain={dirsChain}
-          onClick={(_, index) => {
-            let newPath = path.join(...dirsChain.slice(0, index + 1));
-            handleNavigate(newPath);
-          }}
-        />
-      </div>
-      <div className="mt-1 w-full h-max flex">
-        {isLoadingFiles ? (
-          <div className="flex items-center justify-center mt-[120px] w-full">
-            <ActivityIndicator />
-          </div>
-        ) : (
-          <>
-            {dirs.length === 0 ? (
-              <div className="flex items-center justify-center mt-[120px] w-full">
-                <p className="text-white/50">No videos found</p>
-              </div>
-            ) : (
-              <div className="w-full grid grid-cols-dir gap-3 px-3">
-                {dirs.map((dir) => (
-                  <DirCard
-                    key={dir.path}
-                    dir={dir}
-                    onClick={() => {
-                      if (dir.dir) {
-                        handleNavigate(dir.path);
-                      } else {
-                        navigate(`/player?src=${dir.path}&type=file`);
-                      }
-                    }}
-                    handleDelete={() => handleDelete(dir)}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
+    <div className="w-full h-full px-1.5 py-3">
+      <div className="h-full w-full overflow-y-auto min-scrollbar">
+        <div className="px-3 flex items-center">
+          {path.dirname(currentDir) !== currentDir && (
+            <button
+              onClick={handleBack}
+              className="bg-[#ffffff16] flex items-center px-1.5 py-1.5 text-[20px] rounded-md"
+            >
+              <BackIcon />
+            </button>
+          )}
+          <DirChain
+            dirsChain={dirsChain}
+            onClick={(_, index) => {
+              let newPath = path.join(...dirsChain.slice(0, index + 1));
+              handleNavigate(newPath);
+            }}
+          />
+        </div>
+        <div className="mt-4 w-full h-max flex">
+          {isLoadingFiles ? (
+            <div className="flex items-center justify-center mt-[120px] w-full">
+              <ActivityIndicator />
+            </div>
+          ) : (
+            <>
+              {dirs.length === 0 ? (
+                <div className="flex items-center justify-center mt-[120px] w-full">
+                  <p className="text-white/50">No videos found</p>
+                </div>
+              ) : (
+                <div className="w-full grid grid-cols-dir gap-3 px-3">
+                  {dirs.map((dir) => (
+                    <DirCard
+                      key={dir.path}
+                      dir={dir}
+                      onClick={() => {
+                        if (dir.dir) {
+                          handleNavigate(dir.path);
+                        } else {
+                          const allVideos =
+                            dirs
+                              .filter((d) => !d.dir)
+                              ?.map((video) => video.path) ?? [];
+
+                          const clickedVideoIndex = allVideos.findIndex(
+                            (video) => video === dir.path
+                          );
+
+                          dispatch(playerActions.updatePlaylist(allVideos));
+                          dispatch(
+                            playerActions.updateVideoIndex(clickedVideoIndex)
+                          );
+                          navigate(`/player?type=file`);
+                        }
+                      }}
+                      handleDelete={() => handleDelete(dir)}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

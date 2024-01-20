@@ -1,19 +1,20 @@
 import { FC } from "react";
-import { Separator, SettingCol } from "..";
+import { Separator, SettingCol, SettingInput, SettingSwitch } from "..";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../../../../hooks";
 import { settingsActions } from "../../../../../store";
-import Switch from "react-switch";
 
 const Preferences: FC = () => {
   const dispatch = useDispatch();
   const {
-    primaryColor,
-    lockShortcuts,
     saveTrack,
     saveAdjustments,
     playInBackground,
-    playToggleClick,
+    normalSkipStep,
+    doubleSkipStep,
+    volumeStep,
+    doubleVolumeStep,
+    skipButtons,
   } = useAppSelector((state) => state.settings);
 
   const handleSaveTrackToggle = () => {
@@ -24,49 +25,83 @@ const Preferences: FC = () => {
     dispatch(settingsActions.toggleSaveAdjustments());
   };
 
-  const handleLockShortcutsToggle = () => {
-    dispatch(settingsActions.toggleLockShortcuts());
-  };
-
   const handleTogglePlayInBackground = () => {
     dispatch(settingsActions.togglePlayInBackground());
   };
-
-  const handleTogglePlayToggleClick = () => {
-    dispatch(settingsActions.togglePlayToggleClick());
+  const handleToggleSkipButtons = () => {
+    dispatch(settingsActions.toggleSkipButtons());
   };
   return (
     <>
       <SettingCol
+        title="Forward/Backward"
+        description="the amount of seconds to skip forward/backward"
+      >
+        <SettingInput
+          defaultValue={normalSkipStep}
+          onChange={(value) =>
+            dispatch(settingsActions.updateNormalSkipStep(value))
+          }
+        />
+      </SettingCol>
+      <SettingCol
+        title="Double Forward/Backward"
+        description="The amount of seconds to skip forward/backward (double)"
+      >
+        <SettingInput
+          defaultValue={doubleSkipStep}
+          onChange={(value) =>
+            dispatch(settingsActions.updateDoubleSkipStep(value))
+          }
+        />
+      </SettingCol>
+      <Separator />
+      <SettingCol
+        title="Increase/Decrease"
+        description="The amount of volume to increase/decrease"
+      >
+        <SettingInput
+          defaultValue={volumeStep}
+          onChange={(value) =>
+            dispatch(settingsActions.updateVolumeStep(value))
+          }
+        />
+      </SettingCol>
+      <SettingCol
+        title="Double Increase/Decrease"
+        description="The amount of volume to increase/decrease (double)"
+      >
+        <SettingInput
+          defaultValue={doubleVolumeStep}
+          onChange={(value) =>
+            dispatch(settingsActions.updateDoubleVolumeStep(value))
+          }
+        />
+      </SettingCol>
+      <Separator />
+      <SettingCol
+        title="Enable skip buttons"
+        description="show buttons to skip to the next or previous video of the playlist or the folder you're in"
+      >
+        <SettingSwitch
+          onChange={handleToggleSkipButtons}
+          checked={skipButtons}
+        />
+      </SettingCol>
+      <Separator />
+      <SettingCol
         title="Save track"
         description="save the current track by filename when the player is closed"
       >
-        <Switch
-          onChange={handleSaveTrackToggle}
-          checked={saveTrack}
-          uncheckedIcon={false}
-          checkedIcon={false}
-          onColor={primaryColor}
-          height={23}
-          width={46}
-          handleDiameter={18}
-          className="react-switch"
-        />
+        <SettingSwitch onChange={handleSaveTrackToggle} checked={saveTrack} />
       </SettingCol>
       <SettingCol
         title="Save Adjustments"
         description="save the current adjustments (volume, playback rate, etc) when the player is closed"
       >
-        <Switch
+        <SettingSwitch
           onChange={handleSaveAdjustmentsToggle}
           checked={saveAdjustments}
-          uncheckedIcon={false}
-          checkedIcon={false}
-          onColor={primaryColor}
-          height={23}
-          width={46}
-          handleDiameter={18}
-          className="react-switch"
         />
       </SettingCol>
       <Separator />
@@ -74,19 +109,11 @@ const Preferences: FC = () => {
         title="Play In Background"
         description="keep playing the media when you leave the application"
       >
-        <Switch
+        <SettingSwitch
           onChange={handleTogglePlayInBackground}
           checked={playInBackground}
-          uncheckedIcon={false}
-          checkedIcon={false}
-          onColor={primaryColor}
-          height={23}
-          width={46}
-          handleDiameter={18}
-          className="react-switch"
         />
       </SettingCol>
-
     </>
   );
 };

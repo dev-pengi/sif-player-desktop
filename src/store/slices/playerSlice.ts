@@ -17,7 +17,9 @@ const initialState = {
     isPiP: false,
     isLoading: false,
     videoSrc: null,
-    playlist: [],
+    videoIndex: null,
+    isImporting: true,
+    playlist: [] as any,
 }
 
 const playerSlice = createSlice({
@@ -63,7 +65,36 @@ const playerSlice = createSlice({
         loaded(state) {
             state.isLoading = false
         },
-        reset(state) {
+        updatePlaylist(state, action) {
+            state.playlist = action.payload;
+        },
+        addMediaToPlaylist(state, action) {
+            state.playlist = state.playlist.push(action.payload);
+        },
+        removeMediaFromPlaylist(state, action) {
+            const index = action.payload;
+            state.playlist = state.playlist.splice(index, 1);
+        },
+        updateVideoIndex(state, action) {
+            if (action.payload < state.playlist.length && action.payload >= 0)
+                state.videoIndex = action.payload;
+            else console.error("Index out of bounds");
+        },
+        incrementVideoIndex(state) {
+            if (state.videoIndex < state.playlist.length - 1)
+                state.videoIndex++;
+        },
+        decrementVideoIndex(state) {
+            if (state.videoIndex > 0)
+                state.videoIndex--;
+        },
+        import(state) { 
+            state.isImporting = true
+        },
+        imported(state) { 
+            state.isImporting = false
+        },
+        reset() {
             return initialState;
         }
     },

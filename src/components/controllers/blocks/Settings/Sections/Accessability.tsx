@@ -12,6 +12,7 @@ const Accessability: FC = () => {
     lockGestures,
     gesturesEnabled,
     playToggleClick,
+    shortcutsEnabled,
   } = useAppSelector((state) => state.settings);
 
   const handleLockGesturesToggle = () => {
@@ -32,8 +33,20 @@ const Accessability: FC = () => {
   const handleGesturesEnabledToggle = () => {
     dispatch(settingsActions.toggleGestures());
   };
+  const handleShortcutsEnabledToggle = () => {
+    dispatch(settingsActions.toggleShortcuts());
+  };
   return (
     <>
+      <SettingCol
+        title="Enable Shortcuts"
+        description="control the player using keyboard shortcuts"
+      >
+        <SettingSwitch
+          onChange={handleShortcutsEnabledToggle}
+          checked={shortcutsEnabled}
+        />
+      </SettingCol>
       <SettingCol
         title="Lock Shortcuts"
         description="disable shortcuts when the player is on lock mode"
