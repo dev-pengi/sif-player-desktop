@@ -67,9 +67,6 @@ function App() {
           ::selection {
             background: ${primaryColor} !important;
           }
-          ::-moz-selection {
-            background: ${primaryColor} !important;
-          }
         `}
       </style>
       <Routes>
