@@ -45,12 +45,38 @@ const FilesViewer: FC = () => {
         const dirStat = await fs.promises.stat(res);
 
         if (dirent.isDirectory() && !dirent.name.startsWith(".")) {
+          const nestedDirents = await fs.promises.readdir(res, {
+            withFileTypes: true,
+          });
           dirs_files.push({
             name: dirent.name,
             dir: true,
             path: res,
             parent: currentDir,
             creationDate: dirStat.birthtime,
+            videos: nestedDirents
+              ?.filter((nestedDir) => {
+                const ext = path.extname(nestedDir.name).slice(1);
+                return (
+                  !nestedDir.isDirectory() &&
+                  !nestedDir.name.startsWith(".") &&
+                  formats.includes(ext)
+                );
+              })
+              .map((nestedDir) => {
+                const nestedDirPath = path.resolve(res, nestedDir.name);
+                return nestedDirPath;
+              }),
+            nestedDirs: nestedDirents
+              ?.filter((nestedDir) => {
+                return (
+                  nestedDir.isDirectory() && !nestedDir.name.startsWith(".")
+                );
+              })
+              .map((nestedDir) => {
+                const dirPath = path.resolve(res, nestedDir.name);
+                return dirPath;
+              }),
           });
         } else {
           const ext = path.extname(dirent.name).slice(1);

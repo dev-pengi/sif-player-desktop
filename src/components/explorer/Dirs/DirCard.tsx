@@ -1,9 +1,14 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { FileIcon, FolderIcon } from "../../../assets";
 import { ContextMenu, ContextMenuSeparator, HoverCard } from "@radix-ui/themes";
 import { Modal } from "../../modals";
 import { formatBytes, formatDate, videoType } from "../../../utils";
 import { Separator } from "../..";
+import { playerActions } from "../../../store";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import thumbnailPlaceholder from "../../../static/thumbnail-placeholder.png";
 
 const { dialog } = window.require("@electron/remote");
 const { shell } = window.require("electron");
@@ -18,11 +23,15 @@ interface DirCardProps {
     name: string;
     path: string;
     dir: boolean;
+    videos: string[];
+    nestedDirs: string[];
   };
   handleDelete: () => void;
 }
 
 const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const pathInfo = fs.statSync(dir.path);
@@ -71,6 +80,12 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
     }
   };
 
+  const handlePlayFolder = async () => {
+    dispatch(playerActions.updatePlaylist(dir.videos));
+    dispatch(playerActions.updateVideoIndex(0));
+    navigate("/player?type=file");
+  };
+
   return (
     <>
       <ContextMenu.Root>
@@ -92,10 +107,15 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
                 <HoverCard.Content side="top">
                   <div className="flex items-start gap-5">
                     <div className="bg-[#ffffff21] min-w-[160px] min-h-[100px] max-w-[160px] max-h-[100px] rounded-md ">
-                      {thumbnail && (
+                      {thumbnail ? (
                         <img
                           src={thumbnail}
                           className="min-w-[160px] min-h-[100px] max-w-[160px] max-h-[100px] rounded-md object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={thumbnailPlaceholder}
+                          className="opacity-70 min-w-[160px] min-h-[100px] max-w-[160px] max-h-[100px] rounded-md object-cover"
                         />
                       )}
                     </div>
@@ -131,6 +151,14 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
           </div>
         </ContextMenu.Trigger>
         <ContextMenu.Content>
+          {dir.dir && dir.videos.length > 0 && (
+            <>
+              <ContextMenu.Item onSelect={handlePlayFolder}>
+                Play folder videos ({dir.videos.length})
+              </ContextMenu.Item>
+              <Separator />
+            </>
+          )}
           <ContextMenu.Item onSelect={onClick}>
             {dir.dir ? "Open Folder" : "Play Media"}
           </ContextMenu.Item>
@@ -172,12 +200,22 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
             </p>
           </div>
           {!dir.dir && (
-            <div className="flex items-center py-2">
-              <h3 className="opacity-95">Size:</h3>
-              <p className="ml-6 opacity-80">
-                {formatBytes(dirSize)} ({dirSize} bytes)
-              </p>
-            </div>
+            <>
+              <div className="flex items-center py-2">
+                <h3 className="opacity-95">Size:</h3>
+                <p className="ml-6 opacity-80">
+                  {formatBytes(dirSize)} ({dirSize} bytes)
+                </p>
+              </div>
+            </>
+          )}
+          {dir.dir && (
+            <>
+              <div className="flex items-center py-2">
+                <h3 className="opacity-95">Videos:</h3>
+                <p className="ml-6 opacity-80">{dir.videos.length} videos</p>
+              </div>
+            </>
           )}
           <Separator />
 
