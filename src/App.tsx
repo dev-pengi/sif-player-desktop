@@ -20,15 +20,34 @@ function App() {
 
   const requestOpenedFilePath = () => {
     ipcRenderer.send("request-file-path");
-    ipcRenderer.on("file-path", async (event, filePath) => {
+    ipcRenderer.on("file-path", async (_, filePath) => {
       const fileCheck = path.parse(filePath);
-      const findPath = await fs.promises.readdir(fileCheck.dir);
-      if (!findPath) return;
+      const parentDirents = await fs.promises.readdir(fileCheck.dir, {
+        withFileTypes: true,
+      });
+      console.log(parentDirents);
+      if (!parentDirents) return;
       const isVideo = formats.includes(fileCheck.ext.slice(1));
       if (!isVideo) return;
-      const mediaParent = path.dirname(filePath);
-      localStorage.setItem("last-dir", mediaParent);
-      dispatch(playerActions.updatePlaylist([findPath]));
+      localStorage.setItem("last-dir", fileCheck.dir);
+      const allVideos = parentDirents
+        .filter((dir) => {
+          const ext = path.extname(dir.name).slice(1);
+          return (
+            !dir.isDirectory() &&
+            !dir.name.startsWith(".") &&
+            formats.includes(ext)
+          );
+        })
+        .map((dir) => {
+          const nestedDirPath = path.resolve(fileCheck.dir, dir.name);
+          return nestedDirPath;
+        });
+      const openedFileIndex = allVideos.findIndex(
+        (video) => video === filePath
+      );
+      dispatch(playerActions.updatePlaylist(allVideos));
+      dispatch(playerActions.updateVideoIndex(openedFileIndex));
       navigate(`/player?type=file`);
     });
   };

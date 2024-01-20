@@ -17,37 +17,22 @@ const useVolume = () => {
     if (newVolume == 0) {
       dispatch(volumeActions.mute());
       videoRef.current.muted = true;
-      handleStoreData({
-        volume: newVolume,
-        muted: true,
-      });
     } else {
       dispatch(volumeActions.unmute());
       videoRef.current.muted = false;
-      handleStoreData({
-        volume: newVolume,
-        muted: false,
-      });
     }
     videoRef.current.volume = newVolume / 100;
   };
 
   const handleToggleMute = () => {
     if (!videoRef?.current) return;
-
     if (isMuted) {
       dispatch(volumeActions.unmute());
       videoRef.current.muted = false;
       volume === 0 && handleVolumeChange(30);
-      handleStoreData({
-        muted: false,
-      });
     } else {
       dispatch(volumeActions.mute());
       videoRef.current.muted = true;
-      handleStoreData({
-        muted: true,
-      });
     }
   };
 

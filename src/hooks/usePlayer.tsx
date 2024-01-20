@@ -34,7 +34,6 @@ const usePlayer = () => {
     if (!videoRef.current) return;
     dispatch(playerActions.updateSpeed(speed));
     videoRef.current.playbackRate = speed;
-    handleStoreData({ speed });
   };
 
   const handleAddControllerDependencies = (dependency: string) => {
