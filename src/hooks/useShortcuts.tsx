@@ -2,7 +2,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { usePlayer, useTimer, useVolume } from ".";
 import { useAppSelector } from ".";
 import { useDispatch } from "react-redux";
-import { controlsActions, settingsActions } from "../store";
+import { controlsActions, playerActions, settingsActions } from "../store";
 
 const useShortcuts = () => {
   const dispatch = useDispatch();
@@ -74,7 +74,7 @@ const useShortcuts = () => {
 
   // play/pause with space bar
   useConditionalHotkeys(
-    "space, pause,enter",
+    "space, pause",
     () => {
       handleTogglePlay();
     },
@@ -102,6 +102,21 @@ const useShortcuts = () => {
     },
     true
   );
+  //skipping
+  useConditionalHotkeys(
+    "alt+right",
+    () => {
+      dispatch(playerActions.incrementVideoIndex());
+    },
+    true
+  );
+  useConditionalHotkeys(
+    "alt+left",
+    () => {
+      dispatch(playerActions.decrementVideoIndex());
+    },
+    true
+  );
 
   // seek to start/end with home/end
   useConditionalHotkeys(
@@ -119,7 +134,7 @@ const useShortcuts = () => {
     true
   );
   useConditionalHotkeys(
-    "ctrl+alt+e",
+    "ctrl+e,shift+esc",
     () => {
       handleBack();
     },

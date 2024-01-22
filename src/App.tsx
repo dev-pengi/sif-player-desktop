@@ -9,11 +9,13 @@ import { useNavigate } from "react-router-dom";
 import { formats } from "./constants";
 import { useDispatch } from "react-redux";
 import { playerActions } from "./store";
+
 const { ipcRenderer } = window.require("electron");
 const fs = window.require("fs");
 const path = window.require("path");
 
 function App() {
+  console.log(window.location);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { primaryColor } = useAppSelector((state) => state.settings);

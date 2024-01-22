@@ -10,6 +10,7 @@ import { useAppSelector, usePlayer } from "../../hooks";
 import { throttle } from "lodash";
 import { useDispatch } from "react-redux";
 import { controlsActions } from "../../store";
+import MiniProgress from "./Track/MiniProgress";
 
 const CONTROLLER_DEP: string = "active";
 
@@ -72,6 +73,7 @@ const MainController: FC = () => {
       <CenterController />
       <BottomController />
       <LockedController />
+      <MiniProgress />
     </div>
   );
 };

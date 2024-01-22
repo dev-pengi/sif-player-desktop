@@ -4,7 +4,6 @@
     "max": 90
   },
   "sleepModeDelay": [
-    { "value": 1.01, "label": "1.01 minutes" },
     { "value": 10, "label": "10 minutes" },
     { "value": 15, "label": "15 minutes" },
     { "value": 30, "label": "30 minutes" },
@@ -18,27 +17,5 @@
     { "value": "close", "label": "close app" },
     { "value": "sleep", "label": "sleep pc" },
     { "value": "shutdown", "label": "shutdown pc" }
-  ],
-  "breakDelay": [
-    { "value": 0.2, "label": "12 seconds" },
-    { "value": 0.5, "label": "30 seconds" },
-    { "value": 1, "label": "1 minute" },
-    { "value": 10, "label": "10 minutes" },
-    { "value": 15, "label": "15 minutes" },
-    { "value": 30, "label": "30 minutes" },
-    { "value": 45, "label": "45 minutes" },
-    { "value": 60, "label": "60 minutes" },
-    { "value": 120, "label": "120 minutes" }
-  ],
-  "breakDuration": [
-    { "value": 0.2, "label": "12 seconds" },
-    { "value": 0.5, "label": "30 seconds" },
-    { "value": 1, "label": "1 minute" },
-    { "value": 5, "label": "5 minutes" },
-    { "value": 15, "label": "15 minutes" },
-    { "value": 30, "label": "30 minutes" },
-    { "value": 45, "label": "45 minutes" },
-    { "value": 60, "label": "60 minutes" },
-    { "value": 120, "label": "120 minutes" }
   ]
 }

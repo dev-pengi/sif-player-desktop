@@ -29,6 +29,7 @@ const defaultSettings = {
     sleepModeDelay: 30, // in minutes
     sleepModeBehavior: "pause", // pause, quit video, close app, pc sleep, pc shutdown
     allowRPC: true,
+    miniProgressBar: false,
 }
 
 const colorCheck = (color: string) => {
@@ -62,6 +63,7 @@ const initialState = {
     sleepModeDelay: extractLocalStorage("sleep-mode-delay", 30, "number"),
     sleepModeBehavior: extractLocalStorage("sleep-mode-behavior", "pause", "string"),
     allowRPC: extractLocalStorage("allow-rpc", true, "boolean"),
+    miniProgressBar: extractLocalStorage("mini-progress-bar", false, "boolean"),
 }
 
 const settingsSlice = createSlice({
@@ -171,6 +173,10 @@ const settingsSlice = createSlice({
         toggleSkipButtons(state) {
             localStorage.setItem("skip-buttons", String(!state.skipButtons));
             state.skipButtons = !state.skipButtons
+        },
+        toggleMiniProgressBar(state) {
+            localStorage.setItem("mini-progress-bar", String(!state.miniProgressBar));
+            state.miniProgressBar = !state.miniProgressBar
         },
         reset() {
             return initialState;

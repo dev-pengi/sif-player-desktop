@@ -7,7 +7,7 @@ import { settingsActions } from "../../../../../store";
 
 const Appearance: FC = () => {
   const dispatch = useDispatch();
-  const { primaryColor, showHoverThumbnail } = useAppSelector(
+  const { primaryColor, showHoverThumbnail, miniProgressBar } = useAppSelector(
     (state) => state.settings
   );
 
@@ -17,6 +17,10 @@ const Appearance: FC = () => {
   const handleToggleHoverThumbnail = () => {
     dispatch(settingsActions.toggleHoverThumbnail());
   };
+  const handleToggleMiniProgressBar = () => {
+    dispatch(settingsActions.toggleMiniProgressBar());
+  };
+
   return (
     <>
       <SettingCol
@@ -45,6 +49,15 @@ const Appearance: FC = () => {
         <SettingSwitch
           onChange={handleToggleHoverThumbnail}
           checked={showHoverThumbnail}
+        />
+      </SettingCol>
+      <SettingCol
+        title="Mini progress bar"
+        description="Show a small progress bar indicator at the bottom of the screen when the controls are hidden"
+      >
+        <SettingSwitch
+          onChange={handleToggleMiniProgressBar}
+          checked={miniProgressBar}
         />
       </SettingCol>
     </>

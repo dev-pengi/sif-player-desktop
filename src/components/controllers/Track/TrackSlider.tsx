@@ -22,7 +22,10 @@ const TrackSlider: FC = () => {
   const [thumbnailPosition, setThumbnailPosition] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+
   const sliderRef = useRef(null);
+  const thumbnailRef = useRef(null);
+  const timeTooltipRef = useRef(null);
 
   const thumbnailVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -31,7 +34,7 @@ const TrackSlider: FC = () => {
       const video = thumbnailVideoRef.current;
       if (!video) return;
       video.currentTime = hoverTime;
-    }, 50),
+    }, 200),
     [hoverTime]
   );
 
@@ -57,7 +60,7 @@ const TrackSlider: FC = () => {
     const rect = sliderRef.current.getBoundingClientRect();
     const x = event.clientX - rect.left;
     let Percentage = x / rect.width;
-    const thumbnailWidth = showHoverThumbnail ? 180 : 40;
+    const thumbnailWidth = showHoverThumbnail ? 180 : 60;
 
     const limitedWidth = rect.width - thumbnailWidth / 2;
     if (limitedWidth - x < 0) {
@@ -122,6 +125,7 @@ const TrackSlider: FC = () => {
       >
         {showHoverThumbnail && (
           <motion.div
+            ref={thumbnailRef}
             className="mb-3 flex items-center justify-center rounded-md shadow-md bg-[#ffffff41] border-[2px] border-[#ffffff51] border-solid"
             style={{
               transformOrigin: "bottom",
@@ -156,6 +160,7 @@ const TrackSlider: FC = () => {
           </motion.div>
         )}
         <motion.div
+          ref={timeTooltipRef}
           initial={{
             opacity: 0,
             scale: 0.4,
@@ -173,7 +178,7 @@ const TrackSlider: FC = () => {
         </motion.div>
       </div>
       <motion.div
-        className="w-full cursor-pointer relative bg-[#ffffff52] rounded-[1px] overflow-hidden"
+        className="w-full cursor-pointer absolute bg-[#ffffff50] rounded-[1px] overflow-hidden"
         style={{
           height: "6px",
         }}
@@ -182,10 +187,6 @@ const TrackSlider: FC = () => {
         }}
         animate={{
           scaleY: isHovering || isDragging ? 1 : 0.6,
-        }}
-        transition={{
-          type: "tween",
-          duration: allowAnimations ? 0.15 : 0,
         }}
         onMouseDown={handleMouseDown}
         ref={sliderRef}
@@ -212,6 +213,7 @@ const TrackSlider: FC = () => {
         className="bottom-0 top-0 m-auto flex items-center justify-center absolute transform -translate-x-1/2 pointer-events-none"
       >
         <motion.div
+          layoutId="progress"
           style={{
             borderRadius: "50%",
             backgroundColor: primaryColor,
