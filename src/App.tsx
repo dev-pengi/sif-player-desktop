@@ -15,7 +15,6 @@ const fs = window.require("fs");
 const path = window.require("path");
 
 function App() {
-  console.log(window.location);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { primaryColor } = useAppSelector((state) => state.settings);
@@ -27,7 +26,6 @@ function App() {
       const parentDirents = await fs.promises.readdir(fileCheck.dir, {
         withFileTypes: true,
       });
-      console.log(parentDirents);
       if (!parentDirents) return;
       const isVideo = formats.includes(fileCheck.ext.slice(1));
       if (!isVideo) return;

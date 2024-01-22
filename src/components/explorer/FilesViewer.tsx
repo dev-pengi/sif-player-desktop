@@ -1,16 +1,17 @@
-import { FC, useEffect, useState } from "react";
-import { BackIcon, FileIcon, FolderIcon } from "../../assets";
-import { DirChain } from ".";
-import { useNavigate } from "react-router-dom";
-import { ActivityIndicator } from "../spins";
-import DirCard from "./Dirs/DirCard";
-import { useHotkeys } from "react-hotkeys-hook";
-import { formats } from "../../constants";
-import { playerActions } from "../../store";
+import { FC, useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useHotkeys } from "react-hotkeys-hook";
+
+import { BackIcon } from "../../assets";
+import { DirChain } from ".";
+import { ActivityIndicator } from "../spins";
+import { formats } from "../../constants";
+import { explorerActions, playerActions } from "../../store";
+import DirCard from "./Dirs/DirCard";
+import { useAppSelector } from "../../hooks";
 
 const { dialog } = window.require("@electron/remote");
-
 const path = window.require("path");
 const fs = window.require("fs");
 const os = window.require("os");
@@ -19,20 +20,17 @@ const FilesViewer: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-  const [currentDir, setCurrentDir] = useState<string>(
-    localStorage.getItem("last-dir") || os.homedir()
+  const { currentDir, dirs, dirsChain, isLoadingFiles } = useAppSelector(
+    (state) => state.explorer
   );
-  const [dirsChain, setDirsChain] = useState<string[]>([]);
-  const [dirs, setDirs] = useState([]);
 
   useEffect(() => {
-    document.title = `Sif Player | ${currentDir}`;
+    document.title = `Sif Player | ${path.basename(currentDir)}`;
   }, [currentDir]);
 
   const fetchFiles = async (dir?: string) => {
     dir = path.join(dir || currentDir);
-    setIsLoadingFiles(true);
+    dispatch(explorerActions.loading());
     const dirents = await fs.promises.readdir(currentDir, {
       withFileTypes: true,
     });
@@ -53,7 +51,8 @@ const FilesViewer: FC = () => {
             dir: true,
             path: res,
             parent: currentDir,
-            creationDate: dirStat.birthtime,
+            creationDate: dirStat.birthtimeMs,
+            searchValid: false,
             videos: nestedDirents
               ?.filter((nestedDir) => {
                 const ext = path.extname(nestedDir.name).slice(1);
@@ -87,7 +86,8 @@ const FilesViewer: FC = () => {
               type: ext,
               path: res,
               parent: currentDir,
-              creationDate: dirStat.birthtime,
+              creationDate: dirStat.birthtimeMs,
+              searchValid: false,
             });
           }
         }
@@ -123,10 +123,11 @@ const FilesViewer: FC = () => {
       }
     }
 
-    setDirsChain(chain.reverse());
+    dispatch(explorerActions.updateDirsChain(chain.reverse()));
 
-    setDirs(dirs_files);
-    setIsLoadingFiles(false);
+    dispatch(explorerActions.updateDirs(dirs_files));
+
+    dispatch(explorerActions.loaded());
   };
 
   useEffect(() => {
@@ -134,13 +135,12 @@ const FilesViewer: FC = () => {
   }, [currentDir]);
 
   const handleNavigate = (dir: string) => {
-    setCurrentDir(dir);
+    dispatch(explorerActions.updateCurrentDir(dir));
     localStorage.setItem("last-dir", dir);
   };
 
   const handleBack = () => {
-    const baseDir = path.dirname(currentDir);
-    handleNavigate(baseDir);
+    dispatch(explorerActions.back());
   };
 
   const handleDelete = async (dir) => {
@@ -150,7 +150,7 @@ const FilesViewer: FC = () => {
       } else {
         await fs.promises.unlink(dir.path);
       }
-      setDirs((prev) => prev.filter((d) => d.path !== dir.path));
+      dispatch(explorerActions.removeDir(dir.path));
     } catch (error) {
       console.error(error);
       dialog
@@ -177,14 +177,6 @@ const FilesViewer: FC = () => {
     <div className="w-full h-full px-1.5 py-3">
       <div className="h-full w-full overflow-y-auto min-scrollbar">
         <div className="px-3 flex items-center">
-          {path.dirname(currentDir) !== currentDir && (
-            <button
-              onClick={handleBack}
-              className="bg-[#ffffff16] flex items-center px-1.5 py-1.5 text-[20px] rounded-md"
-            >
-              <BackIcon />
-            </button>
-          )}
           <DirChain
             dirsChain={dirsChain}
             onClick={(_, index) => {
@@ -210,23 +202,28 @@ const FilesViewer: FC = () => {
                     <DirCard
                       key={dir.path}
                       dir={dir}
-                      onClick={() => {
+                      onClick={(type: string = "playlist") => {
                         if (dir.dir) {
                           handleNavigate(dir.path);
                         } else {
-                          const allVideos =
-                            dirs
-                              .filter((d) => !d.dir)
-                              ?.map((video) => video.path) ?? [];
+                          if (type === "single") {
+                            dispatch(playerActions.updatePlaylist([dir.path]));
+                            dispatch(playerActions.updateVideoIndex(0));
+                          } else if (type === "playlist") {
+                            const allVideos =
+                              dirs
+                                .filter((d) => !d.dir)
+                                ?.map((video) => video.path) ?? [];
 
-                          const clickedVideoIndex = allVideos.findIndex(
-                            (video) => video === dir.path
-                          );
+                            const clickedVideoIndex = allVideos.findIndex(
+                              (video) => video === dir.path
+                            );
 
-                          dispatch(playerActions.updatePlaylist(allVideos));
-                          dispatch(
-                            playerActions.updateVideoIndex(clickedVideoIndex)
-                          );
+                            dispatch(playerActions.updatePlaylist(allVideos));
+                            dispatch(
+                              playerActions.updateVideoIndex(clickedVideoIndex)
+                            );
+                          }
                           navigate(`/player?type=file`);
                         }
                       }}

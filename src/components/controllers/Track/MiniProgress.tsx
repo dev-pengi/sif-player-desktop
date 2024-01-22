@@ -10,7 +10,12 @@ const MiniProgress: FC = () => {
   const { timePercentage } = useAppSelector((state) => state.timer);
   return (
     <>
-      <p className="fixed bg-blue-700 top-3 left-6 hidden">
+      <p
+        className="absolute"
+        style={{
+          visibility: "hidden",
+        }}
+      >
         {String(!controllersDeps.length)}
       </p>
       <AnimatePresence>
@@ -24,6 +29,7 @@ const MiniProgress: FC = () => {
               background: "#ffffff20",
               height: 4,
             }}
+            layoutId="progress"
             initial="hidden"
             animate="visible"
             exit="hidden"

@@ -9,7 +9,6 @@ import {
 } from "../Buttons";
 import { formatTime } from "../../../utils";
 import TrackSlider from "../Track/TrackSlider";
-import MiniProgress from "../Track/MiniProgress";
 import LockButton from "../Buttons/LockButton";
 import { useAppSelector } from "../../../hooks";
 import { useDispatch } from "react-redux";

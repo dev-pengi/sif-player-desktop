@@ -65,7 +65,7 @@ const DirItem: FC<DirItemProps> = ({ dirName, dirsChain, onClick, index }) => {
 
 const DirChain: FC<DirChainProps> = ({ dirsChain, onClick }) => {
   return (
-    <div className="flex items-center flex-wrap ml-3 gap-0.5">
+    <div className="flex items-center flex-wrap gap-0.5">
       {dirsChain.map((dirName, index) => (
         <DirItem
           key={index}
