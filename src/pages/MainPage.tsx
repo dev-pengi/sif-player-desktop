@@ -34,8 +34,8 @@ const MainPage: FC = () => {
   useClean();
 
   const { allowRPC } = useAppSelector((state) => state.settings);
-  const { searchKeyword } = useAppSelector((state) => state.explorer);
-  
+  const { searchKeyword, dirs } = useAppSelector((state) => state.explorer);
+
   const [activeTab, setActiveTab] = useState(0);
 
   const handleClose = () => {
@@ -111,6 +111,23 @@ const MainPage: FC = () => {
               onChange={(e) =>
                 dispatch(explorerActions.searchDirs(e.target.value))
               }
+              onKeyDown={(e) => {
+                const searchValidDirs = dirs.filter((dir) => dir.searchValid);
+                if (e.key === "Enter") {
+                  if (searchKeyword === "::back") {
+                    dispatch(explorerActions.back());
+                    dispatch(explorerActions.searchDirs(""));
+                  } else {
+                    if (searchValidDirs.length === 0) return;
+                    searchValidDirs[0].dir &&
+                      dispatch(
+                        explorerActions.updateCurrentDir(
+                          searchValidDirs[0].path
+                        )
+                      );
+                  }
+                }
+              }}
               value={searchKeyword}
             />
           </div>

@@ -23,6 +23,7 @@ const path = require("path");
 const fs = require("fs");
 const isDev = require("electron-is-dev");
 
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 900,
@@ -35,7 +36,7 @@ function createWindow() {
     show: false,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: true,
+      contextIsolation: false,
       webSecurity: false,
       enableRemoteModule: true,
       devTools: isDev,
@@ -43,6 +44,7 @@ function createWindow() {
   });
 
   win.once("ready-to-show", () => {
+    win.moveTop();
     win.focus();
     win.show();
   });

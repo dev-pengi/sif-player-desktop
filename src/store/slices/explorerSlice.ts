@@ -10,7 +10,9 @@ const initialState = {
     dirs: [],
     dirsChain: [],
     isSearching: false,
-    searchKeyword: ''
+    searchKeyword: '',
+    copyFiles: [],
+    cutFiles: [],
 }
 
 const explorerSlice = createSlice({
@@ -56,6 +58,18 @@ const explorerSlice = createSlice({
                     return { ...d, searchValid }
                 })
             }
+        },
+        copyFiles(state, action) {
+            state.copyFiles = action.payload;
+            state.cutFiles = [];
+        },
+        cutFiles(state, action) {
+            state.cutFiles = action.payload;
+            state.copyFiles = [];
+        },
+        pasteFiles(state) {
+            state.copyFiles = [];
+            state.cutFiles = [];
         },
         back(state) {
             const baseDir = path.dirname(state.currentDir);

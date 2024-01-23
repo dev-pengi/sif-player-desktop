@@ -4,7 +4,7 @@ import { ContextMenu, ContextMenuSeparator, HoverCard } from "@radix-ui/themes";
 import { Modal } from "../../modals";
 import { copyText, formatBytes, formatDate, videoType } from "../../../utils";
 import { Separator } from "../..";
-import { playerActions } from "../../../store";
+import { explorerActions, playerActions } from "../../../store";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -34,6 +34,9 @@ interface DirCardProps {
 const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { copyFiles, cutFiles } = useAppSelector((state) => state.explorer);
+
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const pathInfo = fs.statSync(dir.path);
@@ -47,17 +50,41 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const dirType = dir.dir ? "Folder" : videoType(mediaType);
   const dirName = dir.name;
 
-
   const copyPath = () => {
     copyText(dir.path);
-  }
+  };
 
   const copyName = () => {
     copyText(dir.name);
-  }
+  };
 
-  // const copyFile = () => {
-  
+  const copyFile = () => {
+    dispatch(explorerActions.copyFiles([dir.path]));
+  };
+
+  const pasteFiles = async () => {
+    if (copyFiles.length > 0) {
+      dispatch(explorerActions.updateCurrentDir(dir.path));
+      for (const file of copyFiles) {
+        const fileName = path.basename(file);
+        const newPath = path.join(dir.path, fileName);
+        await fs.promises.copyFile(file, newPath);
+      }
+    } else if (cutFiles.length > 0) {
+      dispatch(explorerActions.updateCurrentDir(dir.path));
+      for (const file of cutFiles) {
+        const fileName = path.basename(file);
+        const newPath = path.join(dir.path, fileName);
+        await fs.promises.rename(file, newPath);
+      }
+    }
+
+    dispatch(explorerActions.pasteFiles());
+  };
+
+  const cutFile = () => {
+    dispatch(explorerActions.cutFiles([dir.path]));
+  };
 
   const { isSearching } = useAppSelector((state) => state.explorer);
 
@@ -178,7 +205,7 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
                   <ContextMenu.Item onSelect={handlePlayFolder}>
                     Play folder videos ({dir.videos.length})
                   </ContextMenu.Item>
-                  <Separator />
+                  <ContextMenuSeparator />
                 </>
               )}
               <ContextMenu.Item onSelect={() => onClick("playlist")}>
@@ -195,12 +222,16 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
               <ContextMenu.Item onSelect={handleRevealInExplorer}>
                 Reveal in Explorer
               </ContextMenu.Item>
-              <ContextMenu.Item>Copy Path</ContextMenu.Item>
+              <ContextMenu.Item onSelect={copyPath}>Copy Path</ContextMenu.Item>
+              <ContextMenu.Item onSelect={copyName}>Copy Name</ContextMenu.Item>
               <ContextMenuSeparator />
-              <ContextMenu.Item>
+              {dir.dir && (
+                <ContextMenu.Item onSelect={pasteFiles}>Paste</ContextMenu.Item>
+              )}
+              <ContextMenu.Item onSelect={copyFile}>
                 Copy {dir.dir ? "Folder" : "File"}
               </ContextMenu.Item>
-              <ContextMenu.Item>
+              <ContextMenu.Item onSelect={cutFile}>
                 Cut {dir.dir ? "Folder" : "File"}
               </ContextMenu.Item>
               <ContextMenu.Item onSelect={() => setIsPropertiesModalOpen(true)}>

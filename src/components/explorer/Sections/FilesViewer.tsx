@@ -2,8 +2,6 @@ import { FC, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "react-hotkeys-hook";
-
-import { BackIcon } from "../../../assets";
 import { DirChain } from "..";
 import { ActivityIndicator } from "../../spins";
 import { formats } from "../../../constants";
@@ -14,7 +12,6 @@ import { useAppSelector } from "../../../hooks";
 const { dialog } = window.require("@electron/remote");
 const path = window.require("path");
 const fs = window.require("fs");
-const os = window.require("os");
 
 const FilesViewer: FC = () => {
   const dispatch = useDispatch();

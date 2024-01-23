@@ -63,11 +63,9 @@
   padding: 8px 0 !important;
   background-color: var(--menu-bgColor) !important;
   border: 2px solid hsla(0, 0%, 100%, 0.233) !important;
-  /* pointer-events: auto !important; */
   outline: none !important;
   border-radius: 6px !important;
   margin-right: 20px;
-  /* overflow: auto !important; */
   min-width: 200px;
   z-index: 999999;
 }

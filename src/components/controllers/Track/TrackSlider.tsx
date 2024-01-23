@@ -213,7 +213,6 @@ const TrackSlider: FC = () => {
         className="bottom-0 top-0 m-auto flex items-center justify-center absolute transform -translate-x-1/2 pointer-events-none"
       >
         <motion.div
-          layoutId="progress"
           style={{
             borderRadius: "50%",
             backgroundColor: primaryColor,
@@ -226,7 +225,7 @@ const TrackSlider: FC = () => {
           transition={{
             duration: allowAnimations ? 0.1 : 0,
           }}
-        ></motion.div>
+        />
       </div>
     </div>
   );
