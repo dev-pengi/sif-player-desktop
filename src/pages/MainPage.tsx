@@ -1,19 +1,42 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { BackIcon, CloseIcon, DashIcon, WindowMaximizeIcon } from "../assets";
 import { useAppSelector, useClean, useRPC } from "../hooks";
-import { FilesViewer, Separator } from "../components";
-import { useDispatch } from "react-redux";
+import {
+  FilesViewer,
+  Separator,
+  URLImporter,
+  ExplorerSectionTab,
+} from "../components";
 import { explorerActions } from "../store";
 
 const { ipcRenderer } = window.require("electron");
 
+const tabs = [
+  {
+    name: "File Explorer",
+    component: <FilesViewer />,
+  },
+  {
+    name: "Import URL",
+    component: <URLImporter />,
+  },
+];
+
+const CurrentSection = ({ sectionsTabs, activeTab }) => {
+  return sectionsTabs[activeTab].component;
+};
+
 const MainPage: FC = () => {
   const dispatch = useDispatch();
   const rpc = useRPC();
+
   useClean();
 
   const { allowRPC } = useAppSelector((state) => state.settings);
   const { searchKeyword } = useAppSelector((state) => state.explorer);
+  
+  const [activeTab, setActiveTab] = useState(0);
 
   const handleClose = () => {
     ipcRenderer.send("close");
@@ -69,7 +92,7 @@ const MainPage: FC = () => {
       </nav>
       <div className="flex w-full h-[calc(100%-45px)] fixed top-[45px]">
         <div
-          className="w-[400px] h-full py-3 px-3"
+          className="min-w-[300px] max-w-[300px] h-full py-3 px-3"
           style={{
             borderRight: "1px solid #ffffff21",
           }}
@@ -96,18 +119,19 @@ const MainPage: FC = () => {
             <h3 className="text-[14px] font-bold ml-3 opacity-60 tracking-wide">
               Tabs
             </h3>
-            <div className="bg-[#ffffff21] hover:text-neutral-100 text-[14px] duration-100 cursor-pointer w-full px-3 py-1.5 text-neutral-100 rounded-md">
-              File Explorer
-            </div>
-            <div className=" hover:text-neutral-100 text-[15px] duration-100 cursor-pointer w-full px-3 py-1.5 text-neutral-400 rounded-md">
-              Import URL
-            </div>
-            <div className=" hover:text-neutral-100 text-[15px] duration-100 cursor-pointer w-full px-3 py-1.5 text-neutral-400 rounded-md">
-              File Explorer
-            </div>
+            {tabs.map((tab, index) => {
+              return (
+                <ExplorerSectionTab
+                  key={tab.name}
+                  name={tab.name}
+                  isActive={activeTab === index}
+                  onSelect={() => setActiveTab(index)}
+                />
+              );
+            })}
           </div>
         </div>
-        <FilesViewer />
+        <CurrentSection activeTab={activeTab} sectionsTabs={tabs} />
       </div>
     </div>
   );

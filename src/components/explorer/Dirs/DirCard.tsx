@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { FileIcon, FolderIcon } from "../../../assets";
 import { ContextMenu, ContextMenuSeparator, HoverCard } from "@radix-ui/themes";
 import { Modal } from "../../modals";
-import { formatBytes, formatDate, videoType } from "../../../utils";
+import { copyText, formatBytes, formatDate, videoType } from "../../../utils";
 import { Separator } from "../..";
 import { playerActions } from "../../../store";
 import { useDispatch } from "react-redux";
@@ -46,6 +46,18 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
   const dirType = dir.dir ? "Folder" : videoType(mediaType);
   const dirName = dir.name;
+
+
+  const copyPath = () => {
+    copyText(dir.path);
+  }
+
+  const copyName = () => {
+    copyText(dir.name);
+  }
+
+  // const copyFile = () => {
+  
 
   const { isSearching } = useAppSelector((state) => state.explorer);
 

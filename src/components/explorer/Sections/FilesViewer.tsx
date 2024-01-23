@@ -3,13 +3,13 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import { BackIcon } from "../../assets";
-import { DirChain } from ".";
-import { ActivityIndicator } from "../spins";
-import { formats } from "../../constants";
-import { explorerActions, playerActions } from "../../store";
-import DirCard from "./Dirs/DirCard";
-import { useAppSelector } from "../../hooks";
+import { BackIcon } from "../../../assets";
+import { DirChain } from "..";
+import { ActivityIndicator } from "../../spins";
+import { formats } from "../../../constants";
+import { explorerActions, playerActions } from "../../../store";
+import DirCard from "../Dirs/DirCard";
+import { useAppSelector } from "../../../hooks";
 
 const { dialog } = window.require("@electron/remote");
 const path = window.require("path");

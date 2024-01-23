@@ -91,7 +91,8 @@ const videoType = (type) => {
 };
 
 const separateText = (text: string, separator?: string, separateSymbols?: string[]) => {
-    separator = separator || " ";
+    if (separator !== "") separator = separator || " ";
+
     separateSymbols = separateSymbols || ["-", "_", ".", ","];
     let newText = text;
     separateSymbols.forEach((symbol) => {

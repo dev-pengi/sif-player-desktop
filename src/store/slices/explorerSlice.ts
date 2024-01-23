@@ -48,8 +48,10 @@ const explorerSlice = createSlice({
                 state.dirs = state.dirs.map((d) => {
                     let includePath = d.path.toLowerCase().includes(keyword.toLowerCase());
                     let includeName = d.name.toLowerCase().includes(keyword.toLowerCase());
-                    let includeSeparatedName = separateText(d.name.toLowerCase()).includes(keyword.toLowerCase());
-                    let searchValid = includePath || includeName || includeSeparatedName
+                    let includeFlatSeparatedName = separateText(d.name, '', ["-", "_", ".", ",", ' ']).toLowerCase().includes(keyword.toLowerCase());
+                    let includeFlatName = separateText(d.name, '', [' ']).toLowerCase().includes(keyword.toLowerCase());
+                    let includeSeparatedName = separateText(d.name).toLowerCase().includes(keyword.toLowerCase());
+                    let searchValid = includePath || includeName || includeSeparatedName || includeFlatSeparatedName || includeFlatName
 
                     return { ...d, searchValid }
                 })

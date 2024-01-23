@@ -18,14 +18,14 @@
   },
   "scripts": {
     "clean": "rimraf ./dist && rimraf ./build",
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "electron:serve": "concurrently -k \"yarn dev\" \"yarn electron:start\"",
-    "electron:build": "yarn clean && yarn build && yarn electron:dist && start dist/sif-player.exe",
-    "electron:dist": "electron-builder -c.extraMetadata.main=build/main.js",
-    "electron:start": "wait-on tcp:5173 && electron ."
+    "v:dev": "vite",
+    "v:build": "tsc && vite build",
+    "v:lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "v:preview": "vite preview",
+    "e:dev": "concurrently -k \"yarn v:dev\" \"yarn e:start\"",
+    "e:build": "yarn clean && yarn v:dev && yarn e:dist && start dist/sif-player.exe",
+    "e:dist": "electron-builder -c.extraMetadata.main=build/main.js",
+    "e:start": "wait-on tcp:5173 && electron ."
   },
   "build": {
     "productName": "Sif Player",

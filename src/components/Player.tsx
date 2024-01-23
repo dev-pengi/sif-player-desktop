@@ -2,15 +2,7 @@ import { FC, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { PlayerError } from "./errors";
 import { VideoPlayer } from "./players";
-import {
-  useErrors,
-  useEvents,
-  usePlayer,
-  useShortcuts,
-  useStore,
-  useTimer,
-  useVolume,
-} from "../hooks";
+import { useErrors, useEvents, useShortcuts } from "../hooks";
 import { useDispatch } from "react-redux";
 import { playerActions } from "../store";
 import { useAppSelector } from "../hooks";
@@ -30,12 +22,11 @@ const useVideoSrc = () => {
       const playType = queryParams.get("type");
 
       const { protocol, host } = window.location;
-      if (playType === "local") {
-        const blobUrl = `blob:${protocol}//${host}/${src}`;
-        dispatch(playerActions.source(blobUrl));
-      } else if (playType === "url") {
+      if (playType === "url") {
         dispatch(playerActions.source(src));
-        const url = src;
+        const url = playlist[videoIndex];
+        if (!url) return;
+        dispatch(playerActions.source(url));
         const controller = new AbortController();
         const signal = controller.signal;
 
