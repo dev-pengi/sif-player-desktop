@@ -1,8 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { MainPage, PlayerPage } from "./pages";
 import { Theme } from "@radix-ui/themes";
-import "react-contexify/dist/ReactContexify.css";
-import "@radix-ui/themes/styles.css";
+// import "@radix-ui/themes/styles.css";
 import { useAppSelector } from "./hooks";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,33 +21,37 @@ function App() {
   const requestOpenedFilePath = () => {
     ipcRenderer.send("request-file-path");
     ipcRenderer.on("file-path", async (_, filePath) => {
-      const fileCheck = path.parse(filePath);
-      const parentDirents = await fs.promises.readdir(fileCheck.dir, {
-        withFileTypes: true,
-      });
-      if (!parentDirents) return;
-      const isVideo = formats.includes(fileCheck.ext.slice(1));
-      if (!isVideo) return;
-      localStorage.setItem("last-dir", fileCheck.dir);
-      const allVideos = parentDirents
-        .filter((dir) => {
-          const ext = path.extname(dir.name).slice(1);
-          return (
-            !dir.isDirectory() &&
-            !dir.name.startsWith(".") &&
-            formats.includes(ext)
-          );
-        })
-        .map((dir) => {
-          const nestedDirPath = path.resolve(fileCheck.dir, dir.name);
-          return nestedDirPath;
+      try {
+        const fileCheck = path.parse(filePath);
+        const parentDirents = await fs.promises.readdir(fileCheck.dir, {
+          withFileTypes: true,
         });
-      const openedFileIndex = allVideos.findIndex(
-        (video) => video === filePath
-      );
-      dispatch(playerActions.updatePlaylist(allVideos));
-      dispatch(playerActions.updateVideoIndex(openedFileIndex));
-      navigate(`/player?type=file`);
+        if (!parentDirents) return;
+        const isVideo = formats.includes(fileCheck.ext.slice(1));
+        if (!isVideo) return;
+        localStorage.setItem("last-dir", fileCheck.dir);
+        const allVideos = parentDirents
+          .filter((dir) => {
+            const ext = path.extname(dir.name).slice(1);
+            return (
+              !dir.isDirectory() &&
+              !dir.name.startsWith(".") &&
+              formats.includes(ext)
+            );
+          })
+          .map((dir) => {
+            const nestedDirPath = path.resolve(fileCheck.dir, dir.name);
+            return nestedDirPath;
+          });
+        const openedFileIndex = allVideos.findIndex(
+          (video) => video === filePath
+        );
+        dispatch(playerActions.updatePlaylist(allVideos));
+        dispatch(playerActions.updateVideoIndex(openedFileIndex));
+        navigate(`/player?type=file`);
+      } catch (error) {
+        return;
+      }
     });
   };
 

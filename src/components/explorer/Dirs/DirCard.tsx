@@ -1,18 +1,18 @@
 import { FC, useState } from "react";
-import { FileIcon, FolderIcon } from "../../../assets";
-import { ContextMenu, ContextMenuSeparator, HoverCard } from "@radix-ui/themes";
-import { Modal } from "../../modals";
-import { copyText, formatBytes, formatDate, videoType } from "../../../utils";
-import { Separator } from "../..";
-import { explorerActions, playerActions } from "../../../store";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ContextMenu, HoverCard } from "@radix-ui/themes";
+
+import { Separator } from "../..";
+import { FileIcon, FolderIcon } from "../../../assets";
+import { Modal } from "../../modals";
+import { formatBytes, formatDate, videoType } from "../../../utils";
+import { playerActions } from "../../../store";
 
 import thumbnailPlaceholder from "../../../static/thumbnail-placeholder.png";
 import { useAppSelector } from "../../../hooks";
+import DirContextMenu from "./DirContextMenu";
 
-const { dialog } = window.require("@electron/remote");
-const { shell } = window.require("electron");
 const fs = window.require("fs");
 const path = window.require("path");
 
@@ -28,14 +28,11 @@ interface DirCardProps {
     nestedDirs: string[];
     searchValid: boolean;
   };
-  handleDelete: () => void;
 }
 
-const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
+const DirCard: FC<DirCardProps> = ({ onClick, dir }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { copyFiles, cutFiles } = useAppSelector((state) => state.explorer);
 
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
@@ -44,69 +41,13 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
   const creationTime = formatDate(pathInfo.birthtime);
   const lastModified = formatDate(pathInfo.mtime);
   const lastAccessed = formatDate(pathInfo.atime);
+  const { isSearching } = useAppSelector((state) => state.explorer);
   const dirSize = pathInfo.size;
 
   const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
   const dirType = dir.dir ? "Folder" : videoType(mediaType);
   const dirName = dir.name;
 
-  const copyPath = () => {
-    copyText(dir.path);
-  };
-
-  const copyName = () => {
-    copyText(dir.name);
-  };
-
-  const copyFile = () => {
-    dispatch(explorerActions.copyFiles([dir.path]));
-  };
-
-  const pasteFiles = async () => {
-    if (copyFiles.length > 0) {
-      dispatch(explorerActions.updateCurrentDir(dir.path));
-      for (const file of copyFiles) {
-        const fileName = path.basename(file);
-        const newPath = path.join(dir.path, fileName);
-        await fs.promises.copyFile(file, newPath);
-      }
-    } else if (cutFiles.length > 0) {
-      dispatch(explorerActions.updateCurrentDir(dir.path));
-      for (const file of cutFiles) {
-        const fileName = path.basename(file);
-        const newPath = path.join(dir.path, fileName);
-        await fs.promises.rename(file, newPath);
-      }
-    }
-
-    dispatch(explorerActions.pasteFiles());
-  };
-
-  const cutFile = () => {
-    dispatch(explorerActions.cutFiles([dir.path]));
-  };
-
-  const { isSearching } = useAppSelector((state) => state.explorer);
-
-  const handleRevealInExplorer = () => {
-    shell.showItemInFolder(dir.path);
-  };
-
-  const handleDeleteDialog = () => {
-    dialog
-      .showMessageBox({
-        type: "warning",
-        title: `Sif Player`,
-        message: `Are you sure you want to delete (${dir.name}) permanently?\nThis action cannot be undone.`,
-        buttons: ["Delete", "Cancel"],
-        noLink: true,
-      })
-      .then((res) => {
-        if (res.response === 0) {
-          handleDelete();
-        }
-      });
-  };
   const handleThumbnail = async () => {
     if (dir.dir || thumbnail) return;
     try {
@@ -121,12 +62,6 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
     } catch (err) {
       return;
     }
-  };
-
-  const handlePlayFolder = async () => {
-    dispatch(playerActions.updatePlaylist(dir.videos));
-    dispatch(playerActions.updateVideoIndex(0));
-    navigate("/player?type=file");
   };
 
   return (
@@ -187,130 +122,15 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir, handleDelete }) => {
                   </i>
                 )}
                 <p
-                  aria-label={dir.name}
-                  title={dir.name}
+                  title={`${dir.path} - ${dir.name}`}
                   className="mt-0 text-center max-w-[90%] truncate break-words text-[14px]"
                 >
                   {dir.name}
                 </p>
               </div>
             </ContextMenu.Trigger>
-            <ContextMenu.Content
-              style={{
-                minWidth: 220,
-              }}
-            >
-              {dir.dir && dir.videos.length > 0 && (
-                <>
-                  <ContextMenu.Item onSelect={handlePlayFolder}>
-                    Play folder videos ({dir.videos.length})
-                  </ContextMenu.Item>
-                  <ContextMenuSeparator />
-                </>
-              )}
-              <ContextMenu.Item onSelect={() => onClick("playlist")}>
-                {dir.dir ? "Open Folder" : "Play Media"}
-              </ContextMenu.Item>
-              {!dir.dir && (
-                <>
-                  <ContextMenu.Item onSelect={() => onClick("single")}>
-                    Play as single
-                  </ContextMenu.Item>
-                  <ContextMenuSeparator />
-                </>
-              )}
-              <ContextMenu.Item onSelect={handleRevealInExplorer}>
-                Reveal in Explorer
-              </ContextMenu.Item>
-              <ContextMenu.Item onSelect={copyPath}>Copy Path</ContextMenu.Item>
-              <ContextMenu.Item onSelect={copyName}>Copy Name</ContextMenu.Item>
-              <ContextMenuSeparator />
-              {dir.dir && (
-                <ContextMenu.Item onSelect={pasteFiles}>Paste</ContextMenu.Item>
-              )}
-              <ContextMenu.Item onSelect={copyFile}>
-                Copy {dir.dir ? "Folder" : "File"}
-              </ContextMenu.Item>
-              <ContextMenu.Item onSelect={cutFile}>
-                Cut {dir.dir ? "Folder" : "File"}
-              </ContextMenu.Item>
-              <ContextMenu.Item onSelect={() => setIsPropertiesModalOpen(true)}>
-                Properties
-              </ContextMenu.Item>
-              <ContextMenuSeparator />
-              <ContextMenu.Item color="red" onSelect={handleDeleteDialog}>
-                Delete {dir.dir ? "Folder" : "File"}
-              </ContextMenu.Item>
-            </ContextMenu.Content>
+            <DirContextMenu dir={dir} />
           </ContextMenu.Root>
-          <Modal
-            isOpen={isPropertiesModalOpen}
-            onClose={() => setIsPropertiesModalOpen(false)}
-            style={{
-              box: { maxWidth: "500px" },
-              content: { minHeight: "100px" },
-            }}
-            title={`${dir.dir ? "Folder" : "Media"} Properties`}
-          >
-            <>
-              <div className="flex items-start py-2" title={`Name: ${dirName}`}>
-                <h3 className="opacity-95">Name:</h3>
-                <p className="ml-6 opacity-80 max-w-[90%] truncate">
-                  {dirName}
-                </p>
-              </div>
-              <div className="flex items-center py-2">
-                <h3 className="opacity-95">Type:</h3>
-                <p className="ml-6 opacity-80">{dirType}</p>
-              </div>
-              <Separator />
-              <div
-                className="flex items-center py-2"
-                title={`Path: ${dir.path}`}
-              >
-                <h3 className="opacity-95">Path:</h3>
-                <p className="ml-6 opacity-80 max-w-[90%] truncate">
-                  {dir.path ?? "Unspecified Path"}
-                </p>
-              </div>
-              {!dir.dir && (
-                <>
-                  <div className="flex items-center py-2">
-                    <h3 className="opacity-95">Size:</h3>
-                    <p className="ml-6 opacity-80">
-                      {formatBytes(dirSize)} ({dirSize} bytes)
-                    </p>
-                  </div>
-                </>
-              )}
-              {dir.dir && (
-                <>
-                  <div className="flex items-center py-2">
-                    <h3 className="opacity-95">Videos:</h3>
-                    <p className="ml-6 opacity-80">
-                      {dir.videos.length} videos
-                    </p>
-                  </div>
-                </>
-              )}
-              <Separator />
-
-              <div className="flex items-center py-2">
-                <h3 className="opacity-95">Created:</h3>
-                <p className="ml-6 opacity-80">{creationTime}</p>
-              </div>
-
-              <div className="flex items-center py-2">
-                <h3 className="opacity-95">Modified:</h3>
-                <p className="ml-6 opacity-80">{lastModified}</p>
-              </div>
-
-              <div className="flex items-center py-2">
-                <h3 className="opacity-95">Accessed:</h3>
-                <p className="ml-6 opacity-80">{lastAccessed}</p>
-              </div>
-            </>
-          </Modal>
         </>
       )}
     </>

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppSelector } from "../../../hooks";
 
@@ -6,8 +6,14 @@ const MiniProgress: FC = () => {
   const { primaryColor, miniProgressBar } = useAppSelector(
     (state) => state.settings
   );
+
+  const [showMiniBar, setShowMiniBar] = useState(false);
+
   const { controllersDeps } = useAppSelector((state) => state.controls);
   const { timePercentage } = useAppSelector((state) => state.timer);
+  useEffect(() => {
+    setShowMiniBar(controllersDeps.length === 0);
+  }, [controllersDeps]);
   return (
     <>
       <p
@@ -19,7 +25,7 @@ const MiniProgress: FC = () => {
         {String(!controllersDeps.length)}
       </p>
       <AnimatePresence>
-        {!controllersDeps.length && miniProgressBar && (
+        {showMiniBar && miniProgressBar && (
           <motion.div
             variants={{
               hidden: { opacity: 0 },
@@ -27,12 +33,12 @@ const MiniProgress: FC = () => {
             }}
             style={{
               background: "#ffffff20",
-              height: 4,
+              height: 5,
             }}
             layoutId="progress"
             initial="hidden"
             animate="visible"
-            exit="hidden"
+            exit="hidden" 
             className="w-full absolute -bottom-[1px] left-0 z-[1000]"
           >
             <motion.div

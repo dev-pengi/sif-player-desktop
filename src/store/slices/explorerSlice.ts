@@ -7,6 +7,7 @@ const path = window.require("path");
 const initialState = {
     isLoadingFiles: true,
     currentDir: extractLocalStorage("last-dir", os.homedir(), "string"),
+    currentDirData: null,
     dirs: [],
     dirsChain: [],
     isSearching: false,
@@ -27,9 +28,13 @@ const explorerSlice = createSlice({
         },
         updateCurrentDir(state, action) {
             state.currentDir = action.payload;
+            state.currentDirData = null;
             localStorage.setItem("last-dir", action.payload);
-            state.isSearching = false
+            state.isSearching = false;
             state.searchKeyword = '';
+        },
+        updateCurrentDirData(state, action) {
+            state.currentDirData = action.payload;
         },
         updateDirsChain(state, action) {
             state.dirsChain = action.payload;

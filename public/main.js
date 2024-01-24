@@ -23,7 +23,6 @@ const path = require("path");
 const fs = require("fs");
 const isDev = require("electron-is-dev");
 
-
 function createWindow() {
   const win = new BrowserWindow({
     width: 900,
@@ -118,11 +117,6 @@ function createWindow() {
   checkForUpdates();
   ipcMain.on("check-update", (event) => {
     checkForUpdates();
-  });
-
-  win.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: "deny" };
   });
 
   if (!isDev) {
