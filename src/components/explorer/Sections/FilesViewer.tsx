@@ -5,15 +5,14 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import { DirChain } from "..";
 import { ActivityIndicator } from "../../spins";
-import { formats } from "../../../constants";
 import { explorerActions, playerActions } from "../../../store";
 import DirCard from "../Dirs/DirCard";
 import { useAppSelector } from "../../../hooks";
 import { getDirInformation } from "../../../utils";
 import { ContextMenu } from "@radix-ui/themes";
 import DirContextMenu from "../Dirs/DirContextMenu";
+import { FolderIcon } from "../../../assets";
 
-const { dialog } = window.require("@electron/remote");
 const path = window.require("path");
 const fs = window.require("fs");
 
@@ -115,9 +114,24 @@ const FilesViewer: FC = () => {
             <ContextMenu.Trigger>
               <div>
                 <div
-                  onContextMenu={() => console.log("context")}
-                  className="w-full h-full top-0 left-0 absolute z-110"
-                />
+                  className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute z-110"
+                >
+                  {dirs.map((dir) => (
+                    <>
+                      <div className="opacity-0 pointer-events-none relative flex items-center justify-start px-3 gap-3 cursor-pointer hover:bg-[#ffffff21] rounded-md py-2">
+                        <i className="text-[30px]">
+                          <FolderIcon />
+                        </i>
+                        <p
+                          title={`${dir.path} - ${dir.name}`}
+                          className="mt-0 text-center max-w-[90%] truncate break-words text-[14px]"
+                        >
+                          {dir.name}
+                        </p>
+                      </div>
+                    </>
+                  ))}
+                </div>
               </div>
             </ContextMenu.Trigger>
             <DirContextMenu

@@ -85,6 +85,8 @@ const videoType = (type) => {
             return "MKV Video";
         case "video/flv":
             return "FLV Video";
+        case "video/wmv":
+            return "WMV Video";
         default:
             return "Unspecified Type";
     }

@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ContextMenu, HoverCard } from "@radix-ui/themes";
@@ -31,22 +31,29 @@ interface DirCardProps {
 }
 
 const DirCard: FC<DirCardProps> = ({ onClick, dir }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const pathInfo = fs.statSync(dir.path);
-
-  const creationTime = formatDate(pathInfo.birthtime);
-  const lastModified = formatDate(pathInfo.mtime);
-  const lastAccessed = formatDate(pathInfo.atime);
   const { isSearching } = useAppSelector((state) => state.explorer);
-  const dirSize = pathInfo.size;
 
-  const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
-  const dirType = dir.dir ? "Folder" : videoType(mediaType);
-  const dirName = dir.name;
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [creationTime, setCreationTime] = useState("");
+  const [dirSize, setDirSize] = useState("0");
+  const [dirType, setDirType] = useState("");
+
+  const handlePathInfo = async () => {
+    const pathInfo = await fs.promises.stat(dir.path).catch((e) => {
+      return;
+    });
+    if (!pathInfo) return null;
+
+    setCreationTime(formatDate(pathInfo.birthtimeMs));
+    setDirSize(formatBytes(pathInfo.size));
+
+    const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
+    setDirType(dir.dir ? "Folder" : videoType(mediaType));
+  };
+
+  useEffect(() => {
+    handlePathInfo();
+  }, []);
 
   const handleThumbnail = async () => {
     if (dir.dir || thumbnail) return;
@@ -101,12 +108,12 @@ const DirCard: FC<DirCardProps> = ({ onClick, dir }) => {
                         </div>
                         <div className="max-w-[calc(100%-180px)]">
                           <h3 className="text-[14px] break-words font-bold opacity-80 line-clamp-3">
-                            {dirName}
+                            {dir.name}
                           </h3>
 
                           <p className="text-[12px] mt-3">{creationTime}</p>
                           <p className="text-[12px]">{dirType}</p>
-                          <p className="text-[12px]">{formatBytes(dirSize)}</p>
+                          <p className="text-[12px]">{dirSize}</p>
                         </div>
                       </div>
                     </HoverCard.Content>

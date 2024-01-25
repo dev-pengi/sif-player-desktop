@@ -53,28 +53,47 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
   };
 
   const copyFile = () => {
-    dispatch(explorerActions.copyFiles([dir.path]));
-  };
+    dispatch(explorerActions.copyFiles([dir.path]));};
 
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
+
   const pathInfo = fs.statSync(dir?.path);
 
   const creationTime = formatDate(pathInfo.birthtime);
   const lastModified = formatDate(pathInfo.mtime);
   const lastAccessed = formatDate(pathInfo.atime);
+  
   const dirSize = pathInfo.size;
-
   const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
   const dirType = dir.dir ? "Folder" : videoType(mediaType);
   const dirName = dir.name;
 
   const pasteFiles = async () => {
+    const filePasted = [];
     if (copyFiles.length > 0) {
       dispatch(explorerActions.updateCurrentDir(dir.path));
       for (const file of copyFiles) {
-        const fileName = path.basename(file);
-        const newPath = path.join(dir.path, fileName);
-        await fs.promises.copyFile(file, newPath);
+        let fileName = path.basename(file);
+        let newPath = path.join(dir.path, fileName);
+        const findPath = await fs.promises.stat(newPath).catch((e) => {
+          return;
+        });
+        const fileExists = Boolean(findPath);
+        if (fileExists) {
+          dialog
+            .showMessageBox({
+              type: "info",
+              title: "Sif Player",
+              message: `A file with the name of: ${fileName} already exists in the path: ${dir.path}`,
+              buttons: ["replace", "cancel"],
+              noLink: true,
+            })
+            .then(async (res: any) => {
+              if (res.response === 0) {
+                await fs.promises.copyFile(file, newPath);
+              }
+            });
+        } else await fs.promises.copyFile(file, newPath);
       }
     } else if (cutFiles.length > 0) {
       dispatch(explorerActions.updateCurrentDir(dir.path));
@@ -85,7 +104,7 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
       }
     }
 
-    dispatch(explorerActions.pasteFiles());
+    dispatch(explorerActions.pasteFiles(filePasted));
   };
 
   const cutFile = () => {
@@ -215,24 +234,22 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
                 <ContextMenu.Item onSelect={copyName}>
                   Copy Name
                 </ContextMenu.Item>
-                <Separator separateBy={6} height={1} />
               </>
-            )}
-            {dir.dir && (
-              <ContextMenu.Item onSelect={pasteFiles}>Paste</ContextMenu.Item>
             )}
 
             {!innerMenu && (
               <>
-                <ContextMenu.Item onSelect={copyFile}>
-                  Copy {dir.dir ? "Folder" : "File"}
-                </ContextMenu.Item>
-                <ContextMenu.Item onSelect={cutFile}>
-                  Cut {dir.dir ? "Folder" : "File"}
-                </ContextMenu.Item>
                 <Separator separateBy={6} height={1} />
+                <ContextMenu.Item onSelect={cutFile}>Cut</ContextMenu.Item> 
+                <ContextMenu.Item onSelect={copyFile}>Copy</ContextMenu.Item>
               </>
             )}
+            {dir.dir && (
+              <>
+            <ContextMenu.Item onSelect={pasteFiles}>Paste</ContextMenu.Item>
+              </>
+            )}
+            <Separator separateBy={6} height={1} />
             <ContextMenu.Item onSelect={() => setIsPropertiesModalOpen(true)}>
               Properties
             </ContextMenu.Item>
@@ -278,7 +295,7 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
               <div className="flex items-center py-2">
                 <h3 className="opacity-95">Size:</h3>
                 <p className="ml-6 opacity-80">
-                  {formatBytes(dirSize)} ({dirSize} bytes)
+                {formatBytes(dirSize)} ({dirSize} bytes)
                 </p>
               </div>
             </>

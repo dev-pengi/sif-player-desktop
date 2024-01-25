@@ -14,6 +14,7 @@ const initialState = {
     searchKeyword: '',
     copyFiles: [],
     cutFiles: [],
+    pastingProcess: [],
 }
 
 const explorerSlice = createSlice({
@@ -53,12 +54,11 @@ const explorerSlice = createSlice({
             } else {
                 state.isSearching = true
                 state.dirs = state.dirs.map((d) => {
-                    let includePath = d.path.toLowerCase().includes(keyword.toLowerCase());
-                    let includeName = d.name.toLowerCase().includes(keyword.toLowerCase());
-                    let includeFlatSeparatedName = separateText(d.name, '', ["-", "_", ".", ",", ' ']).toLowerCase().includes(keyword.toLowerCase());
-                    let includeFlatName = separateText(d.name, '', [' ']).toLowerCase().includes(keyword.toLowerCase());
+                    let includeNormalName = d.name.toLowerCase().includes(keyword.toLowerCase());
                     let includeSeparatedName = separateText(d.name).toLowerCase().includes(keyword.toLowerCase());
-                    let searchValid = includePath || includeName || includeSeparatedName || includeFlatSeparatedName || includeFlatName
+                    let includeFlatName = separateText(d.name, '', [' ']).toLowerCase().includes(keyword.toLowerCase());
+                    let includeFlatSeparatedName = separateText(d.name, '', ["-", "_", ".", ",", ' ']).toLowerCase().includes(keyword.toLowerCase());
+                    let searchValid = includeNormalName || includeSeparatedName || includeFlatSeparatedName || includeFlatName
 
                     return { ...d, searchValid }
                 })
@@ -72,9 +72,21 @@ const explorerSlice = createSlice({
             state.cutFiles = action.payload;
             state.copyFiles = [];
         },
-        pasteFiles(state) {
+        pasteFiles(state, action) {
+            state.pastingProcess = [
+                ...state.pastingProcess,
+                ...action.payload
+            ]
             state.copyFiles = [];
             state.cutFiles = [];
+        },
+        pasteEnd(state, action) {
+            state.pastingProcess = state.pastingProcess.filter(path => {
+                return !action.payload.includes(path)
+            })
+        },
+        resetPasteProcess(state) {
+            state.pastingProcess = []
         },
         back(state) {
             const baseDir = path.dirname(state.currentDir);

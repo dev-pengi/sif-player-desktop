@@ -72,7 +72,7 @@ const MainPage: FC = () => {
         <div className="flex flex-row-reverse h-full items-center no-drag">
           <div
             onClick={handleClose}
-            className="w-[45px] flex items-center justify-center h-full duration-100 text-[18px] hover:bg-red-500"
+            className="w-[45px] flex items-center justify-center h-full duration-100 text-[18px] hover:bg-danger"
           >
             <CloseIcon />
           </div>

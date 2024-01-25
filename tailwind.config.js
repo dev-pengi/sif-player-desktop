@@ -21,7 +21,7 @@ module.exports = {
         "dashboard-content": "calc(100% - 300px)",
       },
       colors: {
-        danger: "#dd0000",
+        danger: "#ff2a2a",
       },
     },
   },
