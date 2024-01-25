@@ -110,36 +110,31 @@ const FilesViewer: FC = () => {
     <div className="relative w-full h-full px-1.5 py-3">
       <>
         <div className="h-full w-full overflow-y-auto min-scrollbar relative">
-          <ContextMenu.Root>
-            <ContextMenu.Trigger>
-              <div>
-                <div
-                  className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute z-110"
-                >
-                  {dirs.map((dir) => (
-                    <>
-                      <div className="opacity-0 pointer-events-none relative flex items-center justify-start px-3 gap-3 cursor-pointer hover:bg-[#ffffff21] rounded-md py-2">
-                        <i className="text-[30px]">
-                          <FolderIcon />
-                        </i>
-                        <p
-                          title={`${dir.path} - ${dir.name}`}
-                          className="mt-0 text-center max-w-[90%] truncate break-words text-[14px]"
-                        >
-                          {dir.name}
-                        </p>
-                      </div>
-                    </>
-                  ))}
-                </div>
+          <DirContextMenu
+            dir={currentDirData}
+            loading={!currentDirData}
+            innerMenu
+          >
+            <div>
+              <div className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute z-110">
+                {dirs.map((dir) => (
+                  <>
+                    <div className="opacity-0 pointer-events-none relative flex items-center justify-start px-3 gap-3 cursor-pointer hover:bg-[#ffffff21] rounded-md py-2">
+                      <i className="text-[30px]">
+                        <FolderIcon />
+                      </i>
+                      <p
+                        title={`${dir.path} - ${dir.name}`}
+                        className="mt-0 text-center max-w-[90%] truncate break-words text-[14px]"
+                      >
+                        {dir.name}
+                      </p>
+                    </div>
+                  </>
+                ))}
               </div>
-            </ContextMenu.Trigger>
-            <DirContextMenu
-              dir={currentDirData}
-              loading={!currentDirData}
-              innerMenu
-            />
-          </ContextMenu.Root>
+            </div>
+          </DirContextMenu>
           <div className="w-max px-3 flex items-center relative">
             <DirChain
               dirsChain={dirsChain}

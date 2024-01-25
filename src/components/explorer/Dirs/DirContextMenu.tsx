@@ -1,5 +1,5 @@
 import { ContextMenu } from "@radix-ui/themes";
-import { FC, useState } from "react";
+import React, { FC, ReactNode, useState } from "react";
 import { useAppSelector } from "../../../hooks";
 import { copyText, formatBytes, formatDate, videoType } from "../../../utils";
 import { explorerActions, playerActions } from "../../../store";
@@ -9,41 +9,48 @@ import { Modal } from "../../modals";
 import { Separator } from "../..";
 import { ActivityIndicator } from "../../spins";
 
-const { dialog } = window.require("@electron/remote");
-const { shell } = window.require("electron");
-const path = window.require("path");
+const { dialog } = window.require("@electron/remote") as typeof import('@electron/remote');
+const { shell } = window.require("electron") as typeof import('electron');
+const path = window.require("path") as typeof import('path');
 const fs = window.require("fs");
 
 interface DirContextMenuProps {
   dir: any;
+  children: ReactNode;
   loading?: boolean;
   innerMenu?: boolean;
 }
 
 const DirContextMenu: FC<DirContextMenuProps> = ({
   dir,
+  children,
   innerMenu,
   loading,
 }) => {
-  if (loading)
-    return (
-      <>
-        <ContextMenu.Content
-          style={{
-            minWidth: 220,
-          }}
-        >
-          <div className="w-full h-full flex items-center justify-center">
-            <ActivityIndicator />
-          </div>
-        </ContextMenu.Content>
-      </>
-    );
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { copyFiles, cutFiles, dirs } = useAppSelector(
     (state) => state.explorer
   );
+  const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
+  if (loading)
+    return (
+      <>
+        <ContextMenu.Root>
+          <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+          <ContextMenu.Content
+            style={{
+              minWidth: 220,
+            }}
+          >
+            <div className="w-full h-full flex items-center justify-center">
+              <ActivityIndicator />
+            </div>
+          </ContextMenu.Content>
+        </ContextMenu.Root>
+      </>
+    );
+
   const copyPath = () => {
     copyText(dir.path);
   };
@@ -53,16 +60,15 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
   };
 
   const copyFile = () => {
-    dispatch(explorerActions.copyFiles([dir.path]));};
-
-  const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
+    dispatch(explorerActions.copyFiles([dir.path]));
+  };
 
   const pathInfo = fs.statSync(dir?.path);
 
   const creationTime = formatDate(pathInfo.birthtime);
   const lastModified = formatDate(pathInfo.mtime);
   const lastAccessed = formatDate(pathInfo.atime);
-  
+
   const dirSize = pathInfo.size;
   const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
   const dirType = dir.dir ? "Folder" : videoType(mediaType);
@@ -189,82 +195,87 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
   };
   return (
     <>
-      <ContextMenu.Content
-        style={{
-          minWidth: 220,
-        }}
-      >
-        {!dir ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <ActivityIndicator />
-          </div>
-        ) : (
-          <>
-            {dir.dir && dir.videos.length > 0 && (
-              <>
-                <ContextMenu.Item onSelect={handlePlayFolder}>
-                  Play folder videos ({dir.videos.length})
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+        <ContextMenu.Content
+          style={{
+            minWidth: 220,
+          }}
+        >
+          {!dir ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <ActivityIndicator />
+            </div>
+          ) : (
+            <>
+              {dir.dir && dir.videos.length > 0 && (
+                <>
+                  <ContextMenu.Item onSelect={handlePlayFolder}>
+                    Play folder videos ({dir.videos.length})
+                  </ContextMenu.Item>
+                  <Separator separateBy={6} height={1} />
+                </>
+              )}
+              {!innerMenu && (
+                <ContextMenu.Item onSelect={() => handleDirClick("playlist")}>
+                  {dir.dir ? "Open Folder" : "Play Media"}
                 </ContextMenu.Item>
-                <Separator separateBy={6} height={1} />
-              </>
-            )}
-            {!innerMenu && (
-              <ContextMenu.Item onSelect={() => handleDirClick("playlist")}>
-                {dir.dir ? "Open Folder" : "Play Media"}
+              )}
+              {!dir.dir && (
+                <>
+                  <ContextMenu.Item onSelect={() => handleDirClick("single")}>
+                    Play as single
+                  </ContextMenu.Item>
+                  <Separator separateBy={6} height={1} />
+                </>
+              )}
+              <ContextMenu.Item onSelect={handleRevealInExplorer}>
+                Reveal in Explorer
               </ContextMenu.Item>
-            )}
-            {!dir.dir && (
-              <>
-                <ContextMenu.Item onSelect={() => handleDirClick("single")}>
-                  Play as single
-                </ContextMenu.Item>
-                <Separator separateBy={6} height={1} />
-              </>
-            )}
-            <ContextMenu.Item onSelect={handleRevealInExplorer}>
-              Reveal in Explorer
-            </ContextMenu.Item>
-            <Separator separateBy={6} height={1} />
+              <Separator separateBy={6} height={1} />
 
-            {!innerMenu && (
-              <>
-                <ContextMenu.Item onSelect={copyPath}>
-                  Copy Path
-                </ContextMenu.Item>
-                <ContextMenu.Item onSelect={copyName}>
-                  Copy Name
-                </ContextMenu.Item>
-              </>
-            )}
+              {!innerMenu && (
+                <>
+                  <ContextMenu.Item onSelect={copyPath}>
+                    Copy Path
+                  </ContextMenu.Item>
+                  <ContextMenu.Item onSelect={copyName}>
+                    Copy Name
+                  </ContextMenu.Item>
+                </>
+              )}
 
-            {!innerMenu && (
-              <>
-                <Separator separateBy={6} height={1} />
-                <ContextMenu.Item onSelect={cutFile}>Cut</ContextMenu.Item> 
-                <ContextMenu.Item onSelect={copyFile}>Copy</ContextMenu.Item>
-              </>
-            )}
-            {dir.dir && (
-              <>
-            <ContextMenu.Item onSelect={pasteFiles}>Paste</ContextMenu.Item>
-              </>
-            )}
-            <Separator separateBy={6} height={1} />
-            <ContextMenu.Item onSelect={() => setIsPropertiesModalOpen(true)}>
-              Properties
-            </ContextMenu.Item>
+              {!innerMenu && (
+                <>
+                  <Separator separateBy={6} height={1} />
+                  <ContextMenu.Item onSelect={cutFile}>Cut</ContextMenu.Item>
+                  <ContextMenu.Item onSelect={copyFile}>Copy</ContextMenu.Item>
+                </>
+              )}
+              {dir.dir && (
+                <>
+                  <ContextMenu.Item onSelect={pasteFiles}>
+                    Paste
+                  </ContextMenu.Item>
+                </>
+              )}
+              <Separator separateBy={6} height={1} />
+              <ContextMenu.Item onSelect={() => setIsPropertiesModalOpen(true)}>
+                Properties
+              </ContextMenu.Item>
 
-            {!innerMenu && (
-              <>
-                <Separator separateBy={6} height={1} />
-                <ContextMenu.Item color="red" onSelect={handleDeleteDialog}>
-                  Delete {dir.dir ? "Folder" : "File"}
-                </ContextMenu.Item>
-              </>
-            )}
-          </>
-        )}
-      </ContextMenu.Content>
+              {!innerMenu && (
+                <>
+                  <Separator separateBy={6} height={1} />
+                  <ContextMenu.Item color="red" onSelect={handleDeleteDialog}>
+                    Delete {dir.dir ? "Folder" : "File"}
+                  </ContextMenu.Item>
+                </>
+              )}
+            </>
+          )}
+        </ContextMenu.Content>
+      </ContextMenu.Root>
       <Modal
         isOpen={isPropertiesModalOpen}
         onClose={() => setIsPropertiesModalOpen(false)}
@@ -295,7 +306,7 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
               <div className="flex items-center py-2">
                 <h3 className="opacity-95">Size:</h3>
                 <p className="ml-6 opacity-80">
-                {formatBytes(dirSize)} ({dirSize} bytes)
+                  {formatBytes(dirSize)} ({dirSize} bytes)
                 </p>
               </div>
             </>
