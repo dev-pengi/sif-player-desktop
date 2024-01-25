@@ -9,9 +9,9 @@ import { ActivityIndicator } from "../../spins";
 import { formatBytes, formatDate } from "../../../utils";
 import thumbnailPlaceholder from "../../../static/thumbnail-placeholder.png";
 
-const fs = window.require("fs");
-const path = window.require("path");
-const nativeImage = window.require("electron").nativeImage;
+const fs = window.require("fs") as typeof import("fs");
+const path = window.require("path") as typeof import("path");
+const { nativeImage } = window.require("electron") as typeof import("electron");
 
 const ControlsHolder = ({ dependencyName }) => {
   const {

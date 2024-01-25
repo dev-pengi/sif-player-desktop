@@ -9,10 +9,12 @@ import { Modal } from "../../modals";
 import { Separator } from "../..";
 import { ActivityIndicator } from "../../spins";
 
-const { dialog } = window.require("@electron/remote") as typeof import('@electron/remote');
-const { shell } = window.require("electron") as typeof import('electron');
-const path = window.require("path") as typeof import('path');
-const fs = window.require("fs");
+const { dialog } = window.require(
+  "@electron/remote"
+) as typeof import("@electron/remote");
+const { shell } = window.require("electron") as typeof import("electron");
+const path = window.require("path") as typeof import("path");
+const fs = window.require("fs") as typeof import("fs");
 
 interface DirContextMenuProps {
   dir: any;
@@ -123,7 +125,7 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
   const handleDelete = async (dir) => {
     try {
       if (dir.dir) {
-        await fs.promises.rmdir(dir.path, { recursive: true, force: true });
+        await fs.promises.rmdir(dir.path, { recursive: true });
       } else {
         await fs.promises.unlink(dir.path);
       }

@@ -13,8 +13,8 @@ import { ContextMenu } from "@radix-ui/themes";
 import DirContextMenu from "../Dirs/DirContextMenu";
 import { FolderIcon } from "../../../assets";
 
-const path = window.require("path");
-const fs = window.require("fs");
+const path = window.require("path") as typeof import('path');;
+const fs = window.require("fs") as typeof import('fs');
 
 const FilesViewer: FC = () => {
   const dispatch = useDispatch();
@@ -119,7 +119,7 @@ const FilesViewer: FC = () => {
               <div className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute z-110">
                 {dirs.map((dir) => (
                   <>
-                    <div className="opacity-0 pointer-events-none relative flex items-center justify-start px-3 gap-3 cursor-pointer hover:bg-[#ffffff21] rounded-md py-2">
+                    <div key={dir.path} className="opacity-0 pointer-events-none relative flex items-center justify-start px-3 gap-3 cursor-pointer hover:bg-[#ffffff21] rounded-md py-2">
                       <i className="text-[30px]">
                         <FolderIcon />
                       </i>

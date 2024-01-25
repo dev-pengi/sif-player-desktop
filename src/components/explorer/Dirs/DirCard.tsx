@@ -13,10 +13,10 @@ import thumbnailPlaceholder from "../../../static/thumbnail-placeholder.png";
 import { useAppSelector } from "../../../hooks";
 import DirContextMenu from "./DirContextMenu";
 
-const fs = window.require("fs");
-const path = window.require("path");
+const fs = window.require("fs") as typeof import("fs");
+const path = window.require("path") as typeof import("path");
 
-const nativeImage = window.require("electron").nativeImage;
+const { nativeImage } = window.require("electron") as typeof import("electron");
 
 interface DirCardProps {
   onClick: (type?: string) => void;

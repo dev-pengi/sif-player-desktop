@@ -9,9 +9,9 @@ import { formats } from "./constants";
 import { useDispatch } from "react-redux";
 import { playerActions } from "./store";
 
-const { ipcRenderer } = window.require("electron");
-const fs = window.require("fs");
-const path = window.require("path");
+const { ipcRenderer } = window.require("electron") as typeof import("electron");
+const fs = window.require("fs") as typeof import('fs');
+const path = window.require("path") as typeof import('path');;
 
 function App() {
   const dispatch = useDispatch();

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAppSelector, usePlayer } from "../../../hooks";
 import { CloseIcon, DashIcon, WindowMaximizeIcon } from "../../../assets";
 import { separateText } from "../../../utils";
-const { ipcRenderer } = window.require("electron");
+const { ipcRenderer } = window.require("electron") as typeof import("electron");
 
 const TopController: FC = () => {
   const { mediaData } = useAppSelector((state) => state.player);

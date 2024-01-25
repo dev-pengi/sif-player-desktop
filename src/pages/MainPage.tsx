@@ -10,7 +10,7 @@ import {
 } from "../components";
 import { explorerActions } from "../store";
 
-const { ipcRenderer } = window.require("electron");
+const { ipcRenderer } = window.require("electron") as typeof import("electron");
 
 const tabs = [
   {

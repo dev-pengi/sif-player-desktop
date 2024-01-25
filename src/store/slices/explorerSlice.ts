@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { extractLocalStorage, separateText } from "../../utils";
+import { extractLocalStorage } from "../../utils";
+import Fuse, { IFuseOptions } from 'fuse.js'
 
-const os = window.require("os");
-const path = window.require("path");
+
+const os = window.require("os") as typeof import('os');
+const path = window.require("path") as typeof import('path');
 
 const initialState = {
     isLoadingFiles: true,
@@ -52,16 +54,29 @@ const explorerSlice = createSlice({
             if (!keyword.trim().length) {
                 state.isSearching = false
             } else {
-                state.isSearching = true
-                state.dirs = state.dirs.map((d) => {
-                    let includeNormalName = d.name.toLowerCase().includes(keyword.toLowerCase());
-                    let includeSeparatedName = separateText(d.name).toLowerCase().includes(keyword.toLowerCase());
-                    let includeFlatName = separateText(d.name, '', [' ']).toLowerCase().includes(keyword.toLowerCase());
-                    let includeFlatSeparatedName = separateText(d.name, '', ["-", "_", ".", ",", ' ']).toLowerCase().includes(keyword.toLowerCase());
-                    let searchValid = includeNormalName || includeSeparatedName || includeFlatSeparatedName || includeFlatName
+                let options: IFuseOptions<any> = {
+                    shouldSort: true,
+                    threshold: 0.5,
+                    location: 0,
+                    distance: 100,
+                    minMatchCharLength: 1,
+                    keys: [
+                        "name"
+                    ]
+                };
 
-                    return { ...d, searchValid }
-                })
+                state.isSearching = true;
+
+                let fuse = new Fuse(state.dirs, options);
+
+                let result = fuse.search(keyword);
+
+                let matchedPaths = new Set(result.map(dir => dir.item.path));
+
+                state.dirs = state.dirs.map((d, i) => {
+                    let searchValid = matchedPaths.has(d.path);
+                    return { ...d, searchValid };
+                });
             }
         },
         copyFiles(state, action) {
