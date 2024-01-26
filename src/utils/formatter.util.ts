@@ -104,4 +104,49 @@ const separateText = (text: string, separator?: string, separateSymbols?: string
 }
 
 
-export { formatTime, formatResolution, formatBytes, videoType, formatDate, separateText };
+const serializeName = (previousTexts: string[], newText: string, separator: string = " ", suffix: string = "(%N%)", ext: boolean = true) => {
+    if (!suffix) suffix = "(%N%)";
+    if (!previousTexts || previousTexts.length === 0) return newText;
+    let serializedText = newText;
+    let suffixNumber = 1;
+    const escapedSuffix = suffix.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+
+    
+    let saveExtension = null;
+
+    if (ext) {
+        previousTexts = previousTexts.map((text) => {
+            const textParts = text.split(".");
+            return textParts.slice(0, textParts.length - 1).join(".");
+        });
+        const textParts = newText.split(".");
+        saveExtension = textParts[textParts.length - 1];
+        newText = textParts.slice(0, textParts.length - 1).join(".");
+    }
+
+
+    previousTexts.forEach((text) => {
+        const match = text.match(new RegExp(`\\${separator}${escapedSuffix.replace('%N%', '(\\d+)')}`));
+        if (match) {
+            const number = parseInt(match[1]);
+            if (number >= suffixNumber) {
+                suffixNumber = number + 1;
+            }
+        }
+    });
+    if (previousTexts.includes(newText)) {
+        const match = newText.match(new RegExp(`\\${separator}${escapedSuffix.replace('%N%', '(\\d+)')}`));
+        if (match) {
+            serializedText = newText.replace(new RegExp(`\\${separator}${escapedSuffix.replace('%N%', '(\\d+)')}`), `${separator}${suffix.replace('%N%', `${suffixNumber}`)}`);
+        } else {
+            serializedText = `${newText}${separator}${suffix.replace('%N%', `${suffixNumber}`)}`;
+        }
+    }
+    if (ext && saveExtension) {
+        serializedText = `${serializedText}.${saveExtension}`;
+    }
+    return serializedText;
+}
+
+export { formatTime, formatResolution, formatBytes, videoType, formatDate, separateText, serializeName };

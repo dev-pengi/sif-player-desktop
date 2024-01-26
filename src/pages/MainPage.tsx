@@ -106,12 +106,13 @@ const MainPage: FC = () => {
             </button>
             <input
               type="text"
-              className=" px-3 py-[5.5px] rounded-md bg-[#ffffff16] duration-100 text-[14px] w-[100%]"
+              className="px-3 py-[5.5px] rounded-md bg-[#ffffff16] duration-100 text-[14px] w-[100%]"
               placeholder="Search"
               onChange={(e) =>
                 dispatch(explorerActions.searchDirs(e.target.value))
               }
               onKeyDown={(e) => {
+                // e.preventDefault();
                 const searchValidDirs = dirs.filter((dir) => dir.searchValid);
                 if (e.key === "Enter") {
                   if (searchKeyword === "::back") {

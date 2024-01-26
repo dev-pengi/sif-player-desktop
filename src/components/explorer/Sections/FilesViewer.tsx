@@ -2,6 +2,8 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "react-hotkeys-hook";
+import DragSelect from "dragselect";
+import { throttle } from "lodash";
 
 import { DirChain } from "..";
 import { ActivityIndicator } from "../../spins";
@@ -11,9 +13,6 @@ import { useAppSelector } from "../../../hooks";
 import { getDirInformation } from "../../../utils";
 import DirContextMenu from "../Dirs/DirContextMenu";
 
-import DragSelect from "dragselect";
-import { throttle } from "lodash";
-
 const path = window.require("path") as typeof import("path");
 const fs = window.require("fs") as typeof import("fs");
 
@@ -22,40 +21,21 @@ const FilesViewer: FC = () => {
   const navigate = useNavigate();
   const [keyPressed, setKeyPressed] = useState("");
 
-  useHotkeys(
-    "ctrl,shift",
-    (key) => {
-      if (key.key !== keyPressed) setKeyPressed(key.key);
-    },
-    { keydown: true }
-  );
-
-  useHotkeys(
-    "ctrl,shift",
-    (key) => {
-      if (key.key === keyPressed) setKeyPressed("");
-    },
-    { keyup: true }
-  );
-
-  useHotkeys("ctrl+a", () => {
-    if (selectedDirs.length === dirs.length) {
-      setSelectedDirs([]);
-      return;
-    }
-    setSelectedDirs(dirs.map((dir) => dir.path));
-  });
-  useHotkeys("esc", () => {
-    setSelectedDirs([]);
-  });
+  const { primaryColor } = useAppSelector((state) => state.settings);
 
   const dirCardRefs = useRef([]);
   const explorerAreaRef = useRef(null);
 
   const [selectedDirs, setSelectedDirs] = useState<any[]>([]);
 
-  const { currentDir, dirs, dirsChain, isLoadingFiles, currentDirData } =
-    useAppSelector((state) => state.explorer);
+  const {
+    currentDir,
+    dirs,
+    dirsChain,
+    isLoadingFiles,
+    currentDirData,
+    isSearching,
+  } = useAppSelector((state) => state.explorer);
 
   const handleDragSelectDirs = throttle((ds) => {
     const selectedIndexes = ds
@@ -63,27 +43,32 @@ const FilesViewer: FC = () => {
       .map((el) => dirCardRefs.current.findIndex((ref) => ref.current === el));
 
     setSelectedDirs(selectedIndexes.map((index) => dirs[index]));
-  }, 50);
+  }, 30);
 
   useEffect(() => {
-    const ds = new DragSelect({
-      selectables: dirCardRefs.current.map((ref) => ref.current),
-      area: explorerAreaRef.current,
+    if (!explorerAreaRef?.current) return;
+    let ds = new DragSelect({
+      area: explorerAreaRef?.current,
+      draggability: false,
+      selectorClass: "ds-selector",
     });
 
-    ds.subscribe("DS:start", (el) => {
-      console.log("start");
-    });
-    ds.subscribe("DS:end", (el) => {
-      console.log("end");
-    });
-    ds.subscribe("DS:select", () => handleDragSelectDirs(ds));
-    ds.subscribe("DS:unselect", () => handleDragSelectDirs(ds));
+    try {
+      ds.addSelectables(dirCardRefs.current.map((ref) => ref.current));
+
+      ds.subscribe("DS:end", (el) => {
+        handleDragSelectDirs(ds);
+      });
+    } catch (error) {
+      console.error(error);
+    }
 
     return () => {
-      ds.stop();
-      ds.unsubscribe("DS:end");
-      ds.unsubscribe("DS:select");
+      if (ds) {
+        ds.stop();
+        ds.unsubscribe("DS:end");
+        ds.unsubscribe("DS:select");
+      }
     };
   }, [dirs]);
 
@@ -168,7 +153,49 @@ const FilesViewer: FC = () => {
 
   useHotkeys("backspace", handleBack, { keyup: true });
   useHotkeys("f5", () => fetchFiles(), { keyup: true });
-  useHotkeys("ctrl+p", handlePlayFolder, { keyup: true });
+  useHotkeys(
+    "ctrl+p",
+    () => {
+      if (selectedDirs.length > 0) {
+        dispatch(
+          playerActions.updatePlaylist(
+            selectedDirs.filter((d) => !d.dir).map((d) => d.path)
+          )
+        );
+        dispatch(playerActions.updateVideoIndex(0));
+        navigate("/player?type=file");
+      } else handlePlayFolder();
+    },
+    { keyup: true }
+  );
+  useHotkeys(
+    "ctrl,shift",
+    (key) => {
+      if (key.key !== keyPressed) setKeyPressed(key.key);
+    },
+    { keydown: true }
+  );
+
+  useHotkeys(
+    "ctrl,shift",
+    (key) => {
+      if (key.key === keyPressed) setKeyPressed("");
+    },
+    { keyup: true }
+  );
+
+  useHotkeys("ctrl+a", () => {
+    if (selectedDirs.length === dirs.length) {
+      setSelectedDirs([]);
+      return;
+    }
+    setSelectedDirs(
+      dirs.filter((d) => (isSearching && d.searchValid) || !isSearching)
+    );
+  });
+  useHotkeys("esc", () => {
+    setSelectedDirs([]);
+  });
 
   const scrollContainerRef = useRef(null);
 
@@ -211,83 +238,111 @@ const FilesViewer: FC = () => {
       navigate(`/player?type=file`);
     }
   };
-  const handleDirSelect = (dir, selected) => {
-    if (keyPressed === "" && selectedDirs.length === 0) handleDirNavigate(dir);
-    else if (keyPressed === "" && selectedDirs.length > 0) {
+  const handleDirSelect = (dir) => {
+    if (keyPressed === "") {
+      if (
+        selectedDirs.length === 0 ||
+        (selectedDirs.length === 1 && selectedDirs[0]?.path === dir?.path)
+      ) {
+        handleDirNavigate(dir);
+      }
+    } else if (keyPressed === "" && selectedDirs.length > 1) {
       setSelectedDirs([]);
     }
   };
 
   return (
-    <div className="relative w-full h-full px-1.5 py-3">
-      <>
-        <div
-          className="h-full w-full overflow-y-auto min-scrollbar relative"
-          ref={scrollContainerRef}
-        >
-          <DirContextMenu
-            selectedDirs={[currentDirData]}
-            loading={!currentDirData}
-            innerMenu
+    <>
+      <div className="relative w-full h-full px-1.5 py-3">
+        <>
+          <div
+            className="h-full w-full overflow-y-auto min-scrollbar relative"
+            ref={scrollContainerRef}
           >
-            <div>
-              <div
-                ref={explorerAreaRef}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  setSelectedDirs([]);
+            <DirContextMenu
+              selectedDirs={[currentDirData]}
+              loading={!currentDirData}
+              innerMenu
+            >
+              <div>
+                <div
+                  ref={explorerAreaRef}
+                  onMouseDown={(e) => {
+                    setSelectedDirs([]);
+                  }}
+                  className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute"
+                />
+              </div>
+            </DirContextMenu>
+            <div className="w-max px-3 flex items-center relative">
+              <DirChain
+                dirsChain={dirsChain}
+                onClick={(_, index) => {
+                  let newPath = path.join(...dirsChain.slice(0, index + 1));
+                  handleNavigate(newPath);
                 }}
-                className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute"
               />
             </div>
-          </DirContextMenu>
-          <div className="w-max px-3 flex items-center relative">
-            <DirChain
-              dirsChain={dirsChain}
-              onClick={(_, index) => {
-                let newPath = path.join(...dirsChain.slice(0, index + 1));
-                handleNavigate(newPath);
-              }}
-            />
+            <div className="mt-4 w-full h-max flex">
+              {isLoadingFiles ? (
+                <div className="flex items-center justify-center mt-[120px] w-full">
+                  <ActivityIndicator />
+                </div>
+              ) : (
+                <>
+                  {dirs.length === 0 ? (
+                    <div className="flex items-center justify-center mt-[120px] w-full">
+                      <p className="text-white/50">No videos found</p>
+                    </div>
+                  ) : (
+                    <div className="w-full grid grid-cols-dir gap-3 px-3">
+                      {dirs.map((dir, index) => {
+                        if (index === 0) dirCardRefs.current = [];
+                        dirCardRefs.current[index] = React.createRef();
+                        return (
+                          <>
+                            <div
+                              key={dir.path}
+                              ref={dirCardRefs.current[index]}
+                              style={{
+                                display:
+                                  (isSearching && dir.searchValid) ||
+                                  !isSearching
+                                    ? "block"
+                                    : "none",
+                              }}
+                            >
+                              <DirCard
+                                isSelected={selectedDirs
+                                  .map((d) => d?.path)
+                                  .includes(dir.path)}
+                                onSelected={handleDirSelect}
+                                selectedDirs={selectedDirs}
+                                dir={dir}
+                                handleNavigate={handleDirNavigate}
+                              />
+                            </div>
+                          </>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
-          <div className="mt-4 w-full h-max flex">
-            {isLoadingFiles ? (
-              <div className="flex items-center justify-center mt-[120px] w-full">
-                <ActivityIndicator />
-              </div>
-            ) : (
-              <>
-                {dirs.length === 0 ? (
-                  <div className="flex items-center justify-center mt-[120px] w-full">
-                    <p className="text-white/50">No videos found</p>
-                  </div>
-                ) : (
-                  <div className="w-full grid grid-cols-dir gap-3 px-3">
-                    {dirs.map((dir, index) => {
-                      if (index === 0) dirCardRefs.current = [];
-                      dirCardRefs.current[index] = React.createRef();
-                      return (
-                        <div key={dir.path} ref={dirCardRefs.current[index]}>
-                          <DirCard
-                            isSelected={selectedDirs
-                              .map((d) => d?.path)
-                              .includes(dir.path)}
-                            onSelected={handleDirSelect}
-                            selectedDirs={selectedDirs}
-                            dir={dir}
-                            handleNavigate={handleDirNavigate}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </>
-    </div>
+        </>
+      </div>
+      <style>{`
+        .ds-selector {
+          border: 1px solid ${primaryColor} !important;
+          background-color: ${primaryColor}20 !important;
+        }
+        .ds-selected div {
+          background-color: #ffffff21 !important;
+        }
+      `}</style>
+    </>
   );
 };
 

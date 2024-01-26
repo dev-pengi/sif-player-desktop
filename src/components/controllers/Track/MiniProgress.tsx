@@ -35,7 +35,6 @@ const MiniProgress: FC = () => {
               background: "#ffffff20",
               height: 5,
             }}
-            layoutId="progress"
             initial="hidden"
             animate="visible"
             exit="hidden" 

@@ -1,7 +1,13 @@
 import { ContextMenu } from "@radix-ui/themes";
-import React, { FC, ReactNode, useState } from "react";
+import React, { FC, ReactNode, useEffect, useState } from "react";
 import { useAppSelector } from "../../../hooks";
-import { copyText, formatBytes, formatDate, videoType } from "../../../utils";
+import {
+  copyText,
+  formatBytes,
+  formatDate,
+  videoType,
+  serializeName,
+} from "../../../utils";
 import { explorerActions, playerActions } from "../../../store";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -43,23 +49,23 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
     (state) => state.explorer
   );
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
-  if (!dir)
-    return (
-      <>
-        <ContextMenu.Root>
-          <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
-          <ContextMenu.Content
-            style={{
-              minWidth: 220,
-            }}
-          >
-            <div className="w-full h-full flex items-center justify-center">
-              <ActivityIndicator />
-            </div>
-          </ContextMenu.Content>
-        </ContextMenu.Root>
-      </>
-    );
+  // if (!dir)
+  //   return (
+  //     <>
+  //       <ContextMenu.Root>
+  //         <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+  //         <ContextMenu.Content
+  //           style={{
+  //             minWidth: 220,
+  //           }}
+  //         >
+  //           <div className="w-full h-full flex items-center justify-center">
+  //             <ActivityIndicator />
+  //           </div>
+  //         </ContextMenu.Content>
+  //       </ContextMenu.Root>
+  //     </>
+  //   );
 
   const copyPath = () => {
     copyText(dir.path);
@@ -73,18 +79,33 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
     dispatch(explorerActions.copyFiles([dir.path]));
   };
 
-  const pathInfo = fs.statSync(dir?.path);
+  const [creationTime, setCreationTime] = useState("");
+  const [lastModified, setLastModified] = useState("");
+  const [lastAccessed, setLastAccessed] = useState("");
+  const [dirSize, setDirSize] = useState(0);
+  const [dirType, setDirType] = useState("");
 
-  const creationTime = formatDate(pathInfo.birthtime);
-  const lastModified = formatDate(pathInfo.mtime);
-  const lastAccessed = formatDate(pathInfo.atime);
+  const handlePathInfo = async () => {
+    const pathInfo = await fs.promises.stat(dir.path).catch((e) => {
+      return;
+    });
+    if (!pathInfo) return null;
 
-  const dirSize = pathInfo.size;
-  const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
-  const dirType = dir.dir ? "Folder" : videoType(mediaType);
-  const dirName = dir.name;
+    setCreationTime(formatDate(pathInfo.birthtimeMs));
+    setLastModified(formatDate(pathInfo.mtimeMs));
+    setLastAccessed(formatDate(pathInfo.atimeMs));
+    setDirSize(pathInfo.size);
+
+    const mediaType = `video/${path.parse(dir.path).ext.slice(1)}`;
+    setDirType(dir.dir ? "Folder" : videoType(mediaType));
+  };
+
+  useEffect(() => {
+    handlePathInfo();
+  }, [dir.path]);
 
   const pasteFiles = async () => {
+    if (!dir.dir) return;
     const filePasted = [];
     if (copyFiles.length > 0) {
       dispatch(explorerActions.updateCurrentDir(dir.path));
@@ -101,12 +122,36 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
               type: "info",
               title: "Sif Player",
               message: `A file with the name of: ${fileName} already exists in the path: ${dir.path}`,
-              buttons: ["replace", "cancel"],
+              buttons: ["replace", "Rename", "cancel"],
               noLink: true,
             })
             .then(async (res: any) => {
+              console.log(res.response);
               if (res.response === 0) {
                 await fs.promises.copyFile(file, newPath);
+              } else if (res.response === 1) {
+                console.log([
+                  ...dir.videos.map((v: string) => path.basename(v)),
+                  ...dir.nestedDirs.map((d: string) => path.basename(d)),
+                ]);
+
+                let newFileName = serializeName(
+                  [
+                    ...dir.videos.map((v: string) => path.basename(v)),
+                    ...dir.nestedDirs.map((d: string) => path.basename(d)),
+                  ],
+                  fileName,
+                  " - ",
+                  "Copy (%N%)"
+                );
+                console.log(newFileName);
+                newPath = path.join(dir.path, newFileName);
+                console.log(newPath);
+                try {
+                  await fs.promises.copyFile(file, newPath);
+                } catch (error) {
+                  console.error(`Failed to copy file: ${error.message}`);
+                }
               }
             });
         } else await fs.promises.copyFile(file, newPath);
@@ -296,9 +341,9 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
         title={`${dir.dir ? "Folder" : "Media"} Properties`}
       >
         <>
-          <div className="flex items-start py-2" title={`Name: ${dirName}`}>
+          <div className="flex items-start py-2" title={`Name: ${dir.name}`}>
             <h3 className="opacity-95">Name:</h3>
-            <p className="ml-6 opacity-80 max-w-[90%] truncate">{dirName}</p>
+            <p className="ml-6 opacity-80 max-w-[90%] truncate">{dir.name}</p>
           </div>
           <div className="flex items-center py-2">
             <h3 className="opacity-95">Type:</h3>
@@ -391,8 +436,6 @@ interface MultiDirContextMenuProps {
 const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
   selectedDirs,
   children,
-  innerMenu,
-  loading,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -450,10 +493,10 @@ const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
       });
   };
 
-  const isAllVideos = selectedDirs.every((dir) => !dir.dir);
-
   const playSelectedVideos = () => {
-    const allVideos = selectedDirs.map((dir) => dir.path);
+    const allVideos = selectedDirs
+      .filter((dir) => !dir.dir)
+      .map((dir) => dir.path);
     dispatch(playerActions.updatePlaylist(allVideos));
     dispatch(playerActions.updateVideoIndex(0));
     navigate("/player?type=file");
@@ -468,14 +511,11 @@ const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
             minWidth: 220,
           }}
         >
-          {isAllVideos && (
-            <>
-              <ContextMenu.Item onSelect={playSelectedVideos}>
-                Play Selected Media ({selectedDirs.length})
-              </ContextMenu.Item>
-              <Separator separateBy={6} height={1} />
-            </>
-          )}
+          <ContextMenu.Item onSelect={playSelectedVideos}>
+            Play Selected Media ({selectedDirs.filter((dir) => !dir.dir).length}
+            )
+          </ContextMenu.Item>
+          <Separator separateBy={6} height={1} />
           <ContextMenu.Item onSelect={copyFiles}>
             Copy Selected Files
           </ContextMenu.Item>
@@ -490,8 +530,6 @@ const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
       </ContextMenu.Root>
     </>
   );
-
-  return <></>;
 };
 
 const DirContextMenu: FC<DirContextMenuProps> = ({
@@ -505,11 +543,14 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
       {selectedDirs.length === 0 ? (
         <LoadingDirsContextMenu>{children}</LoadingDirsContextMenu>
       ) : selectedDirs.length === 1 ? (
-        <SingleDirContextMenu dir={selectedDirs[0]} innerMenu={innerMenu}>
-          {children}
-        </SingleDirContextMenu>
+        selectedDirs[0]?.path && (
+          <SingleDirContextMenu dir={selectedDirs[0]} innerMenu={innerMenu}>
+            {children}
+          </SingleDirContextMenu>
+        )
       ) : (
-        selectedDirs.length > 1 && (
+        selectedDirs.length > 1 &&
+        selectedDirs.every((dir) => dir?.path) && (
           <MultiDirContextMenu selectedDirs={selectedDirs}>
             {children}
           </MultiDirContextMenu>
