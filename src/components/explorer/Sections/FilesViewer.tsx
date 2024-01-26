@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -9,19 +9,83 @@ import { explorerActions, playerActions } from "../../../store";
 import DirCard from "../Dirs/DirCard";
 import { useAppSelector } from "../../../hooks";
 import { getDirInformation } from "../../../utils";
-import { ContextMenu } from "@radix-ui/themes";
 import DirContextMenu from "../Dirs/DirContextMenu";
-import { FolderIcon } from "../../../assets";
 
-const path = window.require("path") as typeof import('path');;
-const fs = window.require("fs") as typeof import('fs');
+import DragSelect from "dragselect";
+import { throttle } from "lodash";
+
+const path = window.require("path") as typeof import("path");
+const fs = window.require("fs") as typeof import("fs");
 
 const FilesViewer: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [keyPressed, setKeyPressed] = useState("");
+
+  useHotkeys(
+    "ctrl,shift",
+    (key) => {
+      if (key.key !== keyPressed) setKeyPressed(key.key);
+    },
+    { keydown: true }
+  );
+
+  useHotkeys(
+    "ctrl,shift",
+    (key) => {
+      if (key.key === keyPressed) setKeyPressed("");
+    },
+    { keyup: true }
+  );
+
+  useHotkeys("ctrl+a", () => {
+    if (selectedDirs.length === dirs.length) {
+      setSelectedDirs([]);
+      return;
+    }
+    setSelectedDirs(dirs.map((dir) => dir.path));
+  });
+  useHotkeys("esc", () => {
+    setSelectedDirs([]);
+  });
+
+  const dirCardRefs = useRef([]);
+  const explorerAreaRef = useRef(null);
+
+  const [selectedDirs, setSelectedDirs] = useState<any[]>([]);
 
   const { currentDir, dirs, dirsChain, isLoadingFiles, currentDirData } =
     useAppSelector((state) => state.explorer);
+
+  const handleDragSelectDirs = throttle((ds) => {
+    const selectedIndexes = ds
+      .getSelection()
+      .map((el) => dirCardRefs.current.findIndex((ref) => ref.current === el));
+
+    setSelectedDirs(selectedIndexes.map((index) => dirs[index]));
+  }, 50);
+
+  useEffect(() => {
+    const ds = new DragSelect({
+      selectables: dirCardRefs.current.map((ref) => ref.current),
+      area: explorerAreaRef.current,
+    });
+
+    ds.subscribe("DS:start", (el) => {
+      console.log("start");
+    });
+    ds.subscribe("DS:end", (el) => {
+      console.log("end");
+    });
+    ds.subscribe("DS:select", () => handleDragSelectDirs(ds));
+    ds.subscribe("DS:unselect", () => handleDragSelectDirs(ds));
+
+    return () => {
+      ds.stop();
+      ds.unsubscribe("DS:end");
+      ds.unsubscribe("DS:select");
+    };
+  }, [dirs]);
 
   useEffect(() => {
     document.title = `Sif Player | ${path.basename(currentDir)}`;
@@ -106,33 +170,75 @@ const FilesViewer: FC = () => {
   useHotkeys("f5", () => fetchFiles(), { keyup: true });
   useHotkeys("ctrl+p", handlePlayFolder, { keyup: true });
 
+  const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (explorerAreaRef.current && scrollContainerRef.current) {
+        explorerAreaRef.current.style.top = `${scrollContainerRef.current.scrollTop}px`;
+      }
+    };
+
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  const handleDirNavigate = (dir: any, type: string = "playlist") => {
+    if (dir.dir) {
+      handleNavigate(dir.path);
+    } else {
+      if (type === "single") {
+        dispatch(playerActions.updatePlaylist([dir.path]));
+        dispatch(playerActions.updateVideoIndex(0));
+      } else if (type === "playlist") {
+        const allVideos =
+          dirs.filter((d) => !d.dir)?.map((video) => video.path) ?? [];
+
+        const clickedVideoIndex = allVideos.findIndex(
+          (video) => video === dir.path
+        );
+
+        dispatch(playerActions.updatePlaylist(allVideos));
+        dispatch(playerActions.updateVideoIndex(clickedVideoIndex));
+      }
+      navigate(`/player?type=file`);
+    }
+  };
+  const handleDirSelect = (dir, selected) => {
+    if (keyPressed === "" && selectedDirs.length === 0) handleDirNavigate(dir);
+    else if (keyPressed === "" && selectedDirs.length > 0) {
+      setSelectedDirs([]);
+    }
+  };
+
   return (
     <div className="relative w-full h-full px-1.5 py-3">
       <>
-        <div className="h-full w-full overflow-y-auto min-scrollbar relative">
+        <div
+          className="h-full w-full overflow-y-auto min-scrollbar relative"
+          ref={scrollContainerRef}
+        >
           <DirContextMenu
-            dir={currentDirData}
+            selectedDirs={[currentDirData]}
             loading={!currentDirData}
             innerMenu
           >
             <div>
-              <div className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute z-110">
-                {dirs.map((dir) => (
-                  <>
-                    <div key={dir.path} className="opacity-0 pointer-events-none relative flex items-center justify-start px-3 gap-3 cursor-pointer hover:bg-[#ffffff21] rounded-md py-2">
-                      <i className="text-[30px]">
-                        <FolderIcon />
-                      </i>
-                      <p
-                        title={`${dir.path} - ${dir.name}`}
-                        className="mt-0 text-center max-w-[90%] truncate break-words text-[14px]"
-                      >
-                        {dir.name}
-                      </p>
-                    </div>
-                  </>
-                ))}
-              </div>
+              <div
+                ref={explorerAreaRef}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  setSelectedDirs([]);
+                }}
+                className="min-h-full w-full grid grid-cols-dir gap-3 top-0 left-0 absolute"
+              />
             </div>
           </DirContextMenu>
           <div className="w-max px-3 flex items-center relative">
@@ -157,41 +263,23 @@ const FilesViewer: FC = () => {
                   </div>
                 ) : (
                   <div className="w-full grid grid-cols-dir gap-3 px-3">
-                    {dirs.map((dir) => (
-                      <DirCard
-                        key={dir.path}
-                        dir={dir}
-                        onClick={(type: string = "playlist") => {
-                          if (dir.dir) {
-                            handleNavigate(dir.path);
-                          } else {
-                            if (type === "single") {
-                              dispatch(
-                                playerActions.updatePlaylist([dir.path])
-                              );
-                              dispatch(playerActions.updateVideoIndex(0));
-                            } else if (type === "playlist") {
-                              const allVideos =
-                                dirs
-                                  .filter((d) => !d.dir)
-                                  ?.map((video) => video.path) ?? [];
-
-                              const clickedVideoIndex = allVideos.findIndex(
-                                (video) => video === dir.path
-                              );
-
-                              dispatch(playerActions.updatePlaylist(allVideos));
-                              dispatch(
-                                playerActions.updateVideoIndex(
-                                  clickedVideoIndex
-                                )
-                              );
-                            }
-                            navigate(`/player?type=file`);
-                          }
-                        }}
-                      />
-                    ))}
+                    {dirs.map((dir, index) => {
+                      if (index === 0) dirCardRefs.current = [];
+                      dirCardRefs.current[index] = React.createRef();
+                      return (
+                        <div key={dir.path} ref={dirCardRefs.current[index]}>
+                          <DirCard
+                            isSelected={selectedDirs
+                              .map((d) => d?.path)
+                              .includes(dir.path)}
+                            onSelected={handleDirSelect}
+                            selectedDirs={selectedDirs}
+                            dir={dir}
+                            handleNavigate={handleDirNavigate}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </>

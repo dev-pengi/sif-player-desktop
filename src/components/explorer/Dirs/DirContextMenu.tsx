@@ -17,17 +17,25 @@ const path = window.require("path") as typeof import("path");
 const fs = window.require("fs") as typeof import("fs");
 
 interface DirContextMenuProps {
+  selectedDirs: any;
+  children: ReactNode;
+  loading?: boolean;
+  innerMenu?: boolean;
+  style?: any;
+}
+
+interface SingleDirContextMenuProps {
   dir: any;
   children: ReactNode;
   loading?: boolean;
   innerMenu?: boolean;
 }
 
-const DirContextMenu: FC<DirContextMenuProps> = ({
+const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
   dir,
   children,
-  innerMenu,
   loading,
+  innerMenu,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,7 +43,7 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
     (state) => state.explorer
   );
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
-  if (loading)
+  if (!dir)
     return (
       <>
         <ContextMenu.Root>
@@ -339,6 +347,174 @@ const DirContextMenu: FC<DirContextMenuProps> = ({
           </div>
         </>
       </Modal>
+    </>
+  );
+};
+
+interface LoadingDirsContextMenuProps {
+  children: ReactNode;
+}
+
+const LoadingDirsContextMenu: FC<LoadingDirsContextMenuProps> = ({
+  children,
+}) => {
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+      <ContextMenu.Content
+        style={{
+          minWidth: 220,
+        }}
+      >
+        <div className="w-full h-full flex items-center justify-center">
+          <ActivityIndicator />
+        </div>
+      </ContextMenu.Content>
+    </ContextMenu.Root>
+  );
+};
+
+interface MultiDirContextMenuProps {
+  selectedDirs: any;
+  children: ReactNode;
+  loading?: boolean;
+  innerMenu?: boolean;
+}
+
+interface MultiDirContextMenuProps {
+  selectedDirs: any;
+  children: ReactNode;
+  loading?: boolean;
+  innerMenu?: boolean;
+}
+
+const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
+  selectedDirs,
+  children,
+  innerMenu,
+  loading,
+}) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const copyFiles = () => {
+    dispatch(explorerActions.copyFiles(selectedDirs.map((dir) => dir?.path)));
+  };
+
+  const cutFiles = () => {
+    dispatch(explorerActions.cutFiles(selectedDirs.map((dir) => dir?.path)));
+  };
+
+  const handleDelete = async (dir) => {
+    try {
+      if (dir.dir) {
+        await fs.promises.rmdir(dir.path, { recursive: true });
+      } else {
+        await fs.promises.unlink(dir.path);
+      }
+      dispatch(explorerActions.removeDir(dir.path));
+    } catch (error) {
+      console.error(error);
+      dialog
+        .showMessageBox({
+          type: "error",
+          title: "Sif Player",
+          message: `Failed to delete (${dir.name})`,
+          buttons: ["retry", "cancel"],
+          detail: error.message,
+          noLink: true,
+        })
+        .then((res) => {
+          if (res.response === 0) {
+            handleDelete(dir);
+          }
+        });
+    }
+  };
+
+  const handleDeleteDialog = () => {
+    dialog
+      .showMessageBox({
+        type: "warning",
+        title: `Sif Player`,
+        message: `Are you sure you want to delete (${selectedDirs.length}) items permanently?\nThis action cannot be undone.`,
+        buttons: [`Delete ${selectedDirs.length} items`, "Cancel"],
+        noLink: true,
+      })
+      .then((res) => {
+        if (res.response === 0) {
+          for (const dir of selectedDirs) {
+            handleDelete(dir);
+          }
+        }
+      });
+  };
+
+  const isAllVideos = selectedDirs.every((dir) => !dir.dir);
+
+  const playSelectedVideos = () => {
+    const allVideos = selectedDirs.map((dir) => dir.path);
+    dispatch(playerActions.updatePlaylist(allVideos));
+    dispatch(playerActions.updateVideoIndex(0));
+    navigate("/player?type=file");
+  };
+
+  return (
+    <>
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
+        <ContextMenu.Content
+          style={{
+            minWidth: 220,
+          }}
+        >
+          {isAllVideos && (
+            <>
+              <ContextMenu.Item onSelect={playSelectedVideos}>
+                Play Selected Media ({selectedDirs.length})
+              </ContextMenu.Item>
+              <Separator separateBy={6} height={1} />
+            </>
+          )}
+          <ContextMenu.Item onSelect={copyFiles}>
+            Copy Selected Files
+          </ContextMenu.Item>
+          <ContextMenu.Item onSelect={cutFiles}>
+            Cut Selected Files
+          </ContextMenu.Item>
+          <Separator separateBy={6} height={1} />
+          <ContextMenu.Item color="red" onSelect={handleDeleteDialog}>
+            Delete Selected Files
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
+    </>
+  );
+
+  return <></>;
+};
+
+const DirContextMenu: FC<DirContextMenuProps> = ({
+  selectedDirs,
+  children,
+  innerMenu,
+  loading,
+}) => {
+  return (
+    <>
+      {selectedDirs.length === 0 ? (
+        <LoadingDirsContextMenu>{children}</LoadingDirsContextMenu>
+      ) : selectedDirs.length === 1 ? (
+        <SingleDirContextMenu dir={selectedDirs[0]} innerMenu={innerMenu}>
+          {children}
+        </SingleDirContextMenu>
+      ) : (
+        selectedDirs.length > 1 && (
+          <MultiDirContextMenu selectedDirs={selectedDirs}>
+            {children}
+          </MultiDirContextMenu>
+        )
+      )}
     </>
   );
 };

@@ -56,7 +56,7 @@ const explorerSlice = createSlice({
             } else {
                 let options: IFuseOptions<any> = {
                     shouldSort: true,
-                    threshold: 0.5,
+                    threshold: 0.30,
                     location: 0,
                     distance: 100,
                     minMatchCharLength: 1,

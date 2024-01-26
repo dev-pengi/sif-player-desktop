@@ -57,7 +57,7 @@ const MainPage: FC = () => {
   }, [allowRPC]);
 
   return (
-    <div className="h-screen">
+    <div className="h-screen no-select">
       <nav
         className="flex w-full items-center h-[45px] fixed drag"
         style={{
@@ -148,6 +148,7 @@ const MainPage: FC = () => {
             })}
           </div>
         </div>
+        
         <CurrentSection activeTab={activeTab} sectionsTabs={tabs} />
       </div>
     </div>
