@@ -73,6 +73,20 @@ const getDirInformation = async (
     return file
 }
 
+const extractVideos = (dirs: any[], extractPath = false, isSearching = false) => {
+    const filteredVideo = dirs.filter(dir => {
+        return !dir.dir
+    })
+
+    let videos = filteredVideo.filter(video => {
+        return !isSearching || (isSearching && video.searchValid)
+    });
+
+    if (extractPath) videos = videos.map(video => video.path);
+
+    return videos
+}
+
 export {
-    getDirInformation
+    getDirInformation, extractVideos
 }

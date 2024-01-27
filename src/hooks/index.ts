@@ -10,6 +10,8 @@ import useStore from "./useStore";
 import useToast from "./useToast";
 import useRPC from "./useRPC";
 import { useAppSelector } from "./useAppSelector";
+import useExplorer from "./useExplorer";
+import useExplorerShortcuts from "./useExplorerShortcuts";
 
 
-export { useErrors, useEvents, useLoader, usePlayer, useShortcuts, useTimer, useVolume, useClean, useStore, useAppSelector, useToast, useRPC, };
+export { useErrors, useEvents, useLoader, usePlayer, useShortcuts, useTimer, useVolume, useClean, useStore, useAppSelector, useToast, useRPC, useExplorer, useExplorerShortcuts };

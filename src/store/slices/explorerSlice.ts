@@ -10,6 +10,8 @@ const initialState = {
     isLoadingFiles: true,
     currentDir: extractLocalStorage("last-dir", os.homedir(), "string"),
     currentDirData: null,
+    keyPressed: '',
+    selectedDirs: [],
     dirs: [],
     dirsChain: [],
     isSearching: false,
@@ -102,6 +104,15 @@ const explorerSlice = createSlice({
         },
         resetPasteProcess(state) {
             state.pastingProcess = []
+        },
+        updateKeyPress(state, action) {
+            state.keyPressed = action.payload;
+        },
+        updateSelectedDirs(state, action) {
+            state.selectedDirs = action.payload
+        },
+        resetSelectedDirs(state) {
+            state.selectedDirs = initialState.selectedDirs;
         },
         back(state) {
             const baseDir = path.dirname(state.currentDir);

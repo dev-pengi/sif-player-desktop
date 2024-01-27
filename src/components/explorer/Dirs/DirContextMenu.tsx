@@ -126,15 +126,9 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
               noLink: true,
             })
             .then(async (res: any) => {
-              console.log(res.response);
               if (res.response === 0) {
                 await fs.promises.copyFile(file, newPath);
               } else if (res.response === 1) {
-                console.log([
-                  ...dir.videos.map((v: string) => path.basename(v)),
-                  ...dir.nestedDirs.map((d: string) => path.basename(d)),
-                ]);
-
                 let newFileName = serializeName(
                   [
                     ...dir.videos.map((v: string) => path.basename(v)),
@@ -144,9 +138,7 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
                   " - ",
                   "Copy (%N%)"
                 );
-                console.log(newFileName);
                 newPath = path.join(dir.path, newFileName);
-                console.log(newPath);
                 try {
                   await fs.promises.copyFile(file, newPath);
                 } catch (error) {
