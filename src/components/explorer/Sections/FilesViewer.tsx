@@ -43,10 +43,6 @@ const FilesViewer: FC = () => {
   }, [currentDir]);
 
   useEffect(() => {
-    dispatch(explorerActions.reset());
-  }, []);
-
-  useEffect(() => {
     resetSelections();
     if (!explorerAreaRef?.current) return;
     let ds = new DragSelect({

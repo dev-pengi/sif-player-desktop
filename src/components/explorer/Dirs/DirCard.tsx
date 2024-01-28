@@ -99,11 +99,11 @@ const DirCard: FC<DirCardProps> = ({ dir }) => {
             <HoverCard.Root>
               <HoverCard.Trigger>
                 {/* <div
-                        onMouseEnter={() => {
-                          handleThumbnail();
-                        }}
-                        className="absolute top-0 left-0 w-full h-full z-10"
-                      /> */}
+                  onMouseEnter={() => {
+                    handleThumbnail();
+                  }}
+                  className="absolute top-0 left-0 w-full h-full z-10"
+                /> */}
               </HoverCard.Trigger>
               <HoverCard.Content side="top">
                 <div className="flex items-start gap-5">
