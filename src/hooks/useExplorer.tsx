@@ -1,12 +1,15 @@
 import { explorerActions, playerActions } from "../store";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from ".";
-import { extractVideos, getDirInformation, sortFiles } from "../utils";
+import {
+  extractVideos,
+  getDirInformation,
+  sortFiles,
+  path,
+  fs,
+} from "../utils";
 import { useNavigate } from "react-router-dom";
 import { Dir } from "../types";
-
-const path = window.require("path") as typeof import("path");
-const fs = window.require("fs") as typeof import("fs");
 
 const useExplorer = () => {
   const navigate = useNavigate();

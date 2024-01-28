@@ -1,6 +1,5 @@
 import { useAppSelector } from ".";
-
-const { ipcRenderer } = window.require("electron") as typeof import("electron");
+import { ipcRenderer } from "../utils";
 
 const useRPC = () => {
   const { allowRPC } = useAppSelector((state) => state.settings);

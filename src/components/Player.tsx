@@ -6,8 +6,9 @@ import { useErrors, useEvents, useShortcuts } from "../hooks";
 import { useDispatch } from "react-redux";
 import { playerActions } from "../store";
 import { useAppSelector } from "../hooks";
-const fs = window.require("fs") as typeof import('fs');
-const path = window.require("path") as typeof import('path');;
+
+import { path, fs } from "../utils/node.util";
+
 
 const useVideoSrc = () => {
   const location = useLocation();

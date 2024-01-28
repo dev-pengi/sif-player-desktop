@@ -9,8 +9,7 @@ import {
   ExplorerSectionTab,
 } from "../components";
 import { explorerActions } from "../store";
-
-const { ipcRenderer } = window.require("electron") as typeof import("electron");
+import { ipcRenderer } from "../utils";
 
 const tabs = [
   {
@@ -149,7 +148,7 @@ const MainPage: FC = () => {
             })}
           </div>
         </div>
-        
+
         <CurrentSection activeTab={activeTab} sectionsTabs={tabs} />
       </div>
     </div>

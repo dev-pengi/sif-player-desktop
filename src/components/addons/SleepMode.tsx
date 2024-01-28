@@ -3,7 +3,7 @@ import { useAppSelector, usePlayer } from "../../hooks";
 import { Modal } from "../modals";
 import { findLabel, formatTime } from "../../utils";
 import { settings } from "../../constants";
-const { ipcRenderer } = window.require("electron") as typeof import("electron");
+import { ipcRenderer } from "../../utils";
 
 type HandleAction = () => void;
 

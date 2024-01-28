@@ -1,17 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { extractLocalStorage } from "../../utils";
+import { extractLocalStorage, sortFiles, os, path } from "../../utils";
 import Fuse, { IFuseOptions } from 'fuse.js'
-import { Dir } from "../../types";
+import { Dir, SortType } from "../../types";
 
-
-const os = window.require("os") as typeof import('os');
-const path = window.require("path") as typeof import('path');
 
 const initialState = {
     isLoadingFiles: true,
     currentDir: extractLocalStorage("last-dir", os.homedir(), "string"),
     currentDirData: null,
     keyPressed: '',
+    sortType: "newest" as SortType,
     selectedDirs: [],
     dirs: [] as Dir[],
     dirsChain: [],
@@ -51,7 +49,9 @@ const explorerSlice = createSlice({
             state.dirs = state.dirs.filter((d) => d.path !== action.payload);
         },
         addDir(state, action) {
-            const newDirs = [...state.dirs, action.payload];
+            const newDirs = [...state.dirs.filter((d) => d.path !== action.payload.path), action.payload];
+            const sortedDirs = sortFiles(newDirs, state.sortType);
+            state.dirs = sortedDirs;
         },
         searchDirs(state, action) {
             const keyword = action.payload

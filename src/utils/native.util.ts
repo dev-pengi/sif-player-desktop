@@ -1,6 +1,6 @@
-const { dialog, } = window.require(
-    "@electron/remote"
-) as typeof import("@electron/remote");
+import { electron } from "./node.util";
+
+const { dialog } = electron;
 
 type DialogOptions = {
     type?: "error" | "none" | "info" | "question" | "warning";

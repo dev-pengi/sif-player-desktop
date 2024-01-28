@@ -1,23 +1,22 @@
-import { FC, forwardRef, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { ContextMenu, HoverCard } from "@radix-ui/themes";
+import { FC, useEffect, useState } from "react";
+import { HoverCard } from "@radix-ui/themes";
 
-import { Separator } from "../..";
 import { FileIcon, FolderIcon } from "../../../assets";
-import { Modal } from "../../modals";
-import { formatBytes, formatDate, videoType } from "../../../utils";
-import { playerActions } from "../../../store";
+import {
+  formatBytes,
+  formatDate,
+  videoType,
+  fs,
+  path,
+  electron,
+} from "../../../utils";
 
 import thumbnailPlaceholder from "../../../static/thumbnail-placeholder.png";
 import { useAppSelector, useExplorer } from "../../../hooks";
 import DirContextMenu from "./DirContextMenu";
 import { Dir } from "../../../types";
 
-const fs = window.require("fs") as typeof import("fs");
-const path = window.require("path") as typeof import("path");
-
-const { nativeImage } = window.require("electron") as typeof import("electron");
+const { nativeImage } = electron;
 
 interface DirCardProps {
   dir: Dir;

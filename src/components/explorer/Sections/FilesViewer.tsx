@@ -10,12 +10,9 @@ import {
   useExplorerShortcuts,
 } from "../../../hooks";
 import DirContextMenu from "../Dirs/DirContextMenu";
-import { extractVideos, getDirInformation } from "../../../utils";
+import { getDirInformation, path } from "../../../utils";
 import { explorerActions } from "../../../store";
 import { useDispatch } from "react-redux";
-import { Dir } from "../../../types";
-
-const path = window.require("path") as typeof import("path");
 
 const FilesViewer: FC = () => {
   const dispatch = useDispatch();
@@ -44,6 +41,10 @@ const FilesViewer: FC = () => {
     fetchFiles(currentDir);
     document.title = `Sif Player | ${path.basename(currentDir)}`;
   }, [currentDir]);
+
+  useEffect(() => {
+    dispatch(explorerActions.reset());
+  }, []);
 
   useEffect(() => {
     resetSelections();
@@ -142,7 +143,7 @@ const FilesViewer: FC = () => {
               />
               {pastingProcess.length > 0 && (
                 <div className="flex items-center gap-3 capitalize">
-                  <div className="text-[10px]">
+                  <div className="text-[8px]">
                     <ActivityIndicator />
                   </div>
                   <p className="mb-[4px]">

@@ -1,8 +1,6 @@
+import { fs, path } from ".";
 import { formats } from "../constants";
 import { Dir, SortType } from "../types";
-
-const fs = window.require('fs')
-const path = window.require('path')
 
 const getDirInformation = async (
     dirPath: string
