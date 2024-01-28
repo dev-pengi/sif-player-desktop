@@ -10,9 +10,10 @@ import {
   useExplorerShortcuts,
 } from "../../../hooks";
 import DirContextMenu from "../Dirs/DirContextMenu";
-import { extractVideos } from "../../../utils";
+import { extractVideos, getDirInformation } from "../../../utils";
 import { explorerActions } from "../../../store";
 import { useDispatch } from "react-redux";
+import { Dir } from "../../../types";
 
 const path = window.require("path") as typeof import("path");
 
@@ -78,15 +79,14 @@ const FilesViewer: FC = () => {
   }, [pastingProcess]);
 
   useEffect(() => {
-    const dirData = {
-      dir: true,
-      name: path.basename(currentDir),
-      path: currentDir,
-      videos: extractVideos(dirs, true, isSearching),
-      nestedDirs: dirs.filter((dir) => dir.dir).map((dir) => dir.path),
-      searchValid: true,
+    const handleUpdateCurrentDirData = async () => {
+      if (currentDir) {
+        const dirData = await getDirInformation(currentDir);
+        dispatch(explorerActions.updateCurrentDirData(dirData));
+      }
     };
-    dispatch(explorerActions.updateCurrentDirData(dirData));
+
+    handleUpdateCurrentDirData();
   }, [currentDir, dirs, isSearching]);
 
   const scrollContainerRef = useRef(null);
@@ -145,7 +145,9 @@ const FilesViewer: FC = () => {
                   <div className="text-[10px]">
                     <ActivityIndicator />
                   </div>
-                  <p className="mb-[4px]">pasting {pastingProcess.length} file</p>
+                  <p className="mb-[4px]">
+                    pasting {pastingProcess.length} file
+                  </p>
                 </div>
               )}
             </div>

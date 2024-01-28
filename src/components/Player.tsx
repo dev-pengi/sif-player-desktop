@@ -21,7 +21,6 @@ const useVideoSrc = () => {
       const src = queryParams.get("src");
       const playType = queryParams.get("type");
 
-      const { protocol, host } = window.location;
       if (playType === "url") {
         dispatch(playerActions.source(src));
         const url = playlist[videoIndex];
@@ -30,7 +29,7 @@ const useVideoSrc = () => {
         const controller = new AbortController();
         const signal = controller.signal;
 
-        const mediaData = await fetch(src, { signal });
+        const mediaData = await fetch(url, { signal });
         const name = mediaData.headers
           .get("Content-Disposition")
           .split(";")[1]

@@ -14,16 +14,26 @@ const defaultOptions: DialogOptions = {
     detail: "",
 }
 
-const nativeDialog = async (message: string, options: DialogOptions = defaultOptions) => {
-    const promise = new Promise<string>((resolve, reject) => {
+type Response = {
+    code: number;
+    text: string;
+}
+
+const nativeDialog = async (message: string, options: DialogOptions = defaultOptions): Promise<Response> => {
+    const promise = new Promise<Response>((resolve, reject) => {
         dialog.showMessageBox(
             {
                 title: "Sif Player",
                 message,
+                noLink: true,
                 ...options,
             }
         ).then((result) => {
-            resolve(options?.buttons?.[result.response] ?? "");
+            const response = {
+                code: result.response,
+                text: options?.buttons?.[result.response] ?? "",
+            }
+            resolve(response);
         }).catch((err) => {
             reject(err);
         });
@@ -32,3 +42,5 @@ const nativeDialog = async (message: string, options: DialogOptions = defaultOpt
     return promise;
 }
 
+
+export { nativeDialog };

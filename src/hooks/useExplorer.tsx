@@ -1,8 +1,9 @@
 import { explorerActions, playerActions } from "../store";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from ".";
-import { extractVideos, getDirInformation } from "../utils";
+import { extractVideos, getDirInformation, sortFiles } from "../utils";
 import { useNavigate } from "react-router-dom";
+import { Dir } from "../types";
 
 const path = window.require("path") as typeof import("path");
 const fs = window.require("fs") as typeof import("fs");
@@ -33,29 +34,20 @@ const useExplorer = () => {
       withFileTypes: true,
     });
 
-    const dirs_files: any[] = [];
+    let newDirs: Dir[] = [];
 
     for (const dirent of dirents) {
       try {
         const file = await getDirInformation(
           path.resolve(currentDir, dirent.name)
         );
-        dirs_files.push(file);
+        newDirs.push(file);
       } catch (error) {
         continue;
       }
     }
 
-    dirs_files.sort((a, b) => {
-      if (a.dir !== b.dir) {
-        return a.dir ? -1 : 1;
-      }
-
-      const nameA = a.name.toUpperCase();
-      const nameB = b.name.toUpperCase();
-
-      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-    });
+    newDirs = sortFiles(newDirs);
 
     const chain: string[] = [];
     let isFinished = false;
@@ -75,7 +67,7 @@ const useExplorer = () => {
 
     dispatch(explorerActions.updateDirsChain(chain.reverse()));
 
-    dispatch(explorerActions.updateDirs(dirs_files));
+    dispatch(explorerActions.updateDirs(newDirs));
 
     dispatch(explorerActions.loaded());
   };

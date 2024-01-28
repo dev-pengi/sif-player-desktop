@@ -23,7 +23,7 @@
     "v:lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "v:preview": "vite preview",
     "e:dev": "concurrently -k \"yarn v:dev\" \"yarn e:start\"",
-    "e:build": "yarn clean && yarn v:dev && yarn e:dist && start dist/sif-player.exe",
+    "e:build": "yarn clean && yarn v:build && yarn e:dist && start dist/sif-player.exe",
     "e:dist": "electron-builder -c.extraMetadata.main=build/main.js",
     "e:start": "wait-on tcp:5173 && electron ."
   },

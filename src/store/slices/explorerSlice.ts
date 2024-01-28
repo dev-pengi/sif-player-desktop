@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { extractLocalStorage } from "../../utils";
 import Fuse, { IFuseOptions } from 'fuse.js'
+import { Dir } from "../../types";
 
 
 const os = window.require("os") as typeof import('os');
@@ -12,12 +13,11 @@ const initialState = {
     currentDirData: null,
     keyPressed: '',
     selectedDirs: [],
-    dirs: [],
+    dirs: [] as Dir[],
     dirsChain: [],
     isSearching: false,
     searchKeyword: '',
     copyFiles: [],
-    cutFiles: [],
     pastingProcess: [],
 }
 
@@ -49,6 +49,9 @@ const explorerSlice = createSlice({
         },
         removeDir(state, action) {
             state.dirs = state.dirs.filter((d) => d.path !== action.payload);
+        },
+        addDir(state, action) {
+            const newDirs = [...state.dirs, action.payload];
         },
         searchDirs(state, action) {
             const keyword = action.payload
@@ -83,18 +86,14 @@ const explorerSlice = createSlice({
         },
         copyFiles(state, action) {
             state.copyFiles = action.payload;
-            state.cutFiles = [];
         },
-        cutFiles(state, action) {
-            state.cutFiles = action.payload;
+        resetCopyFiles(state) {
             state.copyFiles = [];
         },
         pasteFiles(state, action) {
             state.pastingProcess = [
                 ...action.payload
             ]
-            state.copyFiles = [];
-            state.cutFiles = [];
         },
         pasteEnd(state, action) {
             state.pastingProcess = state.pastingProcess.filter(path => {

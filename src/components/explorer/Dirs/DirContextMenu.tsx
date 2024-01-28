@@ -7,6 +7,8 @@ import {
   formatDate,
   videoType,
   serializeName,
+  nativeDialog,
+  getDirInformation,
 } from "../../../utils";
 import { explorerActions, playerActions } from "../../../store";
 import { useDispatch } from "react-redux";
@@ -14,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { Modal } from "../../modals";
 import { Separator } from "../..";
 import { ActivityIndicator } from "../../spins";
+import { Dir } from "../../../types";
 
 const { dialog } = window.require(
   "@electron/remote"
@@ -23,7 +26,7 @@ const path = window.require("path") as typeof import("path");
 const fs = window.require("fs") as typeof import("fs");
 
 interface DirContextMenuProps {
-  selectedDirs: any;
+  selectedDirs: Dir[];
   children: ReactNode;
   loading?: boolean;
   innerMenu?: boolean;
@@ -31,21 +34,31 @@ interface DirContextMenuProps {
 }
 
 interface SingleDirContextMenuProps {
-  dir: any;
+  dir: Dir;
   children: ReactNode;
   loading?: boolean;
   innerMenu?: boolean;
 }
 
+interface MultiDirContextMenuProps {
+  selectedDirs: Dir[];
+  children: ReactNode;
+  loading?: boolean;
+  innerMenu?: boolean;
+}
+
+interface LoadingDirsContextMenuProps {
+  children: ReactNode;
+}
+
 const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
   dir,
   children,
-  loading,
   innerMenu,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { copyFiles, cutFiles, dirs } = useAppSelector(
+  const { copyFiles, dirs, currentDir } = useAppSelector(
     (state) => state.explorer
   );
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
@@ -59,7 +72,14 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
   };
 
   const copyFile = () => {
-    dispatch(explorerActions.copyFiles([dir.path]));
+    dispatch(
+      explorerActions.copyFiles([
+        {
+          path: dir.path,
+          move: false,
+        },
+      ])
+    );
   };
 
   const [creationTime, setCreationTime] = useState("");
@@ -108,66 +128,104 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
         noLink: true,
       });
     }
-    console.log(newPath);
+
+    try {
+      const file = await getDirInformation(newPath);
+      if (currentDir === path.dirname(newPath))
+        dispatch(explorerActions.addDir(file));
+
+      if (isMoved && dirs.map((d) => d.path).includes(oldPath)) {
+        dispatch(explorerActions.removeDir(oldPath));
+      }
+    } catch (error) {
+      console.error(error);
+    }
     dispatch(explorerActions.pasteEnd([oldPath]));
   };
 
+  const checkFileExists = async (path: string): Promise<boolean> => {
+    const findPath = await fs.promises.stat(path).catch((e) => {
+      return false;
+    });
+    return Boolean(findPath);
+  };
+
   const pasteFiles = async () => {
-    if (!dir.dir) return;
-    if (copyFiles.length > 0) {
-      dispatch(explorerActions.updateCurrentDir(dir.path));
-      for (const file of copyFiles) {
-        dispatch(explorerActions.pasteFiles(copyFiles));
-        let fileName = path.basename(file);
-        let newPath = path.join(dir.path, fileName);
-        const findPath = await fs.promises.stat(newPath).catch((e) => {
-          return;
-        });
-        const fileExists = Boolean(findPath);
-        if (fileExists) {
-          dialog
-            .showMessageBox({
-              type: "info",
-              title: "Sif Player",
-              message: `A file with the name of: ${fileName} already exists in the path: ${dir.path}`,
-              buttons: ["replace", "Rename", "cancel"],
-              noLink: true,
-            })
-            .then(async (res: any) => {
-              if (res.response === 0) {
-                await handlePasteProcess(file, newPath, false);
-              } else if (res.response === 1) {
-                let newFileName = serializeName(
-                  [
-                    ...dir.videos.map((v: string) => path.basename(v)),
-                    ...dir.nestedDirs.map((d: string) => path.basename(d)),
-                  ],
-                  fileName,
-                  " - ",
-                  "Copy (%N%)"
-                );
-                console.log(newFileName);
-                newPath = path.join(dir.path, newFileName);
-                await handlePasteProcess(file, newPath, false);
-              }
-            });
-        } else {
-          await handlePasteProcess(file, newPath, false);
-        }
+    let isThereAnExistingFile = false;
+    let filesList = [...copyFiles];
+    dispatch(explorerActions.resetCopyFiles());
+
+    for (let file of filesList) {
+      const fileName = path.basename(file.path);
+      const newPath = path.join(dir.path, fileName);
+      const fileExists = await checkFileExists(newPath);
+      if (fileExists) {
+        isThereAnExistingFile = true;
+        break;
       }
-    } else if (cutFiles.length > 0) {
-      dispatch(explorerActions.updateCurrentDir(dir.path));
-      for (const file of cutFiles) {
-        dispatch(explorerActions.pasteFiles(cutFiles));
-        const fileName = path.basename(file);
-        const newPath = path.join(dir.path, fileName);
-        await handlePasteProcess(file, newPath, true);
+    }
+
+    let behavior = isThereAnExistingFile ? "rename" : "default";
+
+    if (isThereAnExistingFile) {
+      const dialogText =
+        filesList.length > 1
+          ? "some of the files do already exist in the destination folder, what do you want to do?"
+          : "the file already exists in the destination folder, what do you want to do?";
+
+      const buttons =
+        filesList.length > 1
+          ? ["Replace all", "Rename all", "Cancel"]
+          : ["Replace", "Rename", "Cancel"];
+      const response = await nativeDialog(dialogText, {
+        type: "info",
+        buttons,
+      });
+
+      if (response.code === 0) {
+        behavior = "replace";
+      } else if (response.code === 1) {
+        behavior = "rename";
+      } else {
+        return;
+      }
+    }
+
+    dispatch(explorerActions.pasteFiles(filesList.map((f) => f.path)));
+    for (let file of filesList) {
+      const fileName = path.basename(file.path);
+      const newPath = path.join(dir.path, fileName);
+      const fileExists = await checkFileExists(newPath);
+
+      if (fileExists && behavior === "replace") {
+        await handlePasteProcess(file.path, newPath, file.move);
+      } else if (fileExists && behavior === "rename") {
+        let newFileName = serializeName(
+          [
+            ...dir.videos.map((v: string) => path.basename(v)),
+            ...dir.nestedDirs.map((d: string) => path.basename(d)),
+          ],
+          fileName,
+          " - ",
+          "Copy (%N%)"
+        );
+        const newPath = path.join(dir.path, newFileName);
+        await handlePasteProcess(file.path, newPath, file.move);
+      } else {
+        await handlePasteProcess(file.path, newPath, file.move);
       }
     }
   };
 
   const cutFile = () => {
-    dispatch(explorerActions.cutFiles([dir.path]));
+    dispatch(
+      explorerActions.copyFiles([
+        {
+          path: dir.path,
+          move: true,
+        },
+      ])
+    );
   };
 
   const handleRevealInExplorer = () => {
@@ -391,10 +449,6 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
   );
 };
 
-interface LoadingDirsContextMenuProps {
-  children: ReactNode;
-}
-
 const LoadingDirsContextMenu: FC<LoadingDirsContextMenuProps> = ({
   children,
 }) => {
@@ -414,20 +468,6 @@ const LoadingDirsContextMenu: FC<LoadingDirsContextMenuProps> = ({
   );
 };
 
-interface MultiDirContextMenuProps {
-  selectedDirs: any;
-  children: ReactNode;
-  loading?: boolean;
-  innerMenu?: boolean;
-}
-
-interface MultiDirContextMenuProps {
-  selectedDirs: any;
-  children: ReactNode;
-  loading?: boolean;
-  innerMenu?: boolean;
-}
-
 const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
   selectedDirs,
   children,
@@ -436,11 +476,29 @@ const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
   const navigate = useNavigate();
 
   const copyFiles = () => {
-    dispatch(explorerActions.copyFiles(selectedDirs.map((dir) => dir?.path)));
+    dispatch(
+      explorerActions.copyFiles(
+        selectedDirs.map((dir) => {
+          return {
+            path: dir?.path,
+            move: false,
+          };
+        })
+      )
+    );
   };
 
   const cutFiles = () => {
-    dispatch(explorerActions.cutFiles(selectedDirs.map((dir) => dir?.path)));
+    dispatch(
+      explorerActions.copyFiles(
+        selectedDirs.map((dir) => {
+          return {
+            path: dir?.path,
+            move: true,
+          };
+        })
+      )
+    );
   };
 
   const handleDelete = async (dir) => {

@@ -12,20 +12,12 @@ import { playerActions } from "../../../store";
 import thumbnailPlaceholder from "../../../static/thumbnail-placeholder.png";
 import { useAppSelector, useExplorer } from "../../../hooks";
 import DirContextMenu from "./DirContextMenu";
+import { Dir } from "../../../types";
 
 const fs = window.require("fs") as typeof import("fs");
 const path = window.require("path") as typeof import("path");
 
 const { nativeImage } = window.require("electron") as typeof import("electron");
-
-interface Dir {
-  name: string;
-  path: string;
-  dir: boolean;
-  videos: string[];
-  nestedDirs: string[];
-  searchValid: boolean;
-}
 
 interface DirCardProps {
   dir: Dir;
