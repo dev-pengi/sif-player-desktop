@@ -91,7 +91,6 @@ const explorerSlice = createSlice({
         },
         pasteFiles(state, action) {
             state.pastingProcess = [
-                ...state.pastingProcess,
                 ...action.payload
             ]
             state.copyFiles = [];

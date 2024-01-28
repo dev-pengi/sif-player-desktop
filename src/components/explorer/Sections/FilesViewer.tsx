@@ -10,10 +10,14 @@ import {
   useExplorerShortcuts,
 } from "../../../hooks";
 import DirContextMenu from "../Dirs/DirContextMenu";
+import { extractVideos } from "../../../utils";
+import { explorerActions } from "../../../store";
+import { useDispatch } from "react-redux";
 
 const path = window.require("path") as typeof import("path");
 
 const FilesViewer: FC = () => {
+  const dispatch = useDispatch();
   useExplorerShortcuts();
 
   const [isSelecting, setIsSelecting] = useState(false);
@@ -32,6 +36,7 @@ const FilesViewer: FC = () => {
     isLoadingFiles,
     currentDirData,
     isSearching,
+    pastingProcess,
   } = useAppSelector((state) => state.explorer);
 
   useEffect(() => {
@@ -67,6 +72,22 @@ const FilesViewer: FC = () => {
       ds.unsubscribe("DS:end");
     };
   }, [dirs]);
+
+  useEffect(() => {
+    console.log(pastingProcess.length);
+  }, [pastingProcess]);
+
+  useEffect(() => {
+    const dirData = {
+      dir: true,
+      name: path.basename(currentDir),
+      path: currentDir,
+      videos: extractVideos(dirs, true, isSearching),
+      nestedDirs: dirs.filter((dir) => dir.dir).map((dir) => dir.path),
+      searchValid: true,
+    };
+    dispatch(explorerActions.updateCurrentDirData(dirData));
+  }, [currentDir, dirs, isSearching]);
 
   const scrollContainerRef = useRef(null);
 
@@ -111,7 +132,7 @@ const FilesViewer: FC = () => {
                 />
               </div>
             </DirContextMenu>
-            <div className="w-max px-3 flex items-center relative">
+            <div className="w-full px-3 flex items-center justify-between relative">
               <DirChain
                 dirsChain={dirsChain}
                 onClick={(_, index) => {
@@ -119,6 +140,14 @@ const FilesViewer: FC = () => {
                   handleNavigate(newPath);
                 }}
               />
+              {pastingProcess.length > 0 && (
+                <div className="flex items-center gap-3 capitalize">
+                  <div className="text-[10px]">
+                    <ActivityIndicator />
+                  </div>
+                  <p className="mb-[4px]">pasting {pastingProcess.length} file</p>
+                </div>
+              )}
             </div>
             <div className="mt-4 w-full h-max flex">
               {isLoadingFiles ? (

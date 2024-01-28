@@ -49,23 +49,6 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
     (state) => state.explorer
   );
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
-  // if (!dir)
-  //   return (
-  //     <>
-  //       <ContextMenu.Root>
-  //         <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
-  //         <ContextMenu.Content
-  //           style={{
-  //             minWidth: 220,
-  //           }}
-  //         >
-  //           <div className="w-full h-full flex items-center justify-center">
-  //             <ActivityIndicator />
-  //           </div>
-  //         </ContextMenu.Content>
-  //       </ContextMenu.Root>
-  //     </>
-  //   );
 
   const copyPath = () => {
     copyText(dir.path);
@@ -104,12 +87,37 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
     handlePathInfo();
   }, [dir.path]);
 
+  const handlePasteProcess = async (
+    oldPath: string,
+    newPath: string,
+    isMoved: boolean
+  ) => {
+    try {
+      if (isMoved) {
+        await fs.promises.rename(oldPath, newPath);
+      } else {
+        await fs.promises.copyFile(oldPath, newPath);
+      }
+      console.log("finished");
+    } catch (error) {
+      dialog.showMessageBox({
+        type: "error",
+        title: "Sif Player",
+        message: `Failed to paste (${path.basename(oldPath)})`,
+        detail: error.message,
+        noLink: true,
+      });
+    }
+    console.log(newPath);
+    dispatch(explorerActions.pasteEnd([oldPath]));
+  };
+
   const pasteFiles = async () => {
     if (!dir.dir) return;
-    const filePasted = [];
     if (copyFiles.length > 0) {
       dispatch(explorerActions.updateCurrentDir(dir.path));
       for (const file of copyFiles) {
+        dispatch(explorerActions.pasteFiles(copyFiles));
         let fileName = path.basename(file);
         let newPath = path.join(dir.path, fileName);
         const findPath = await fs.promises.stat(newPath).catch((e) => {
@@ -127,7 +135,7 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
             })
             .then(async (res: any) => {
               if (res.response === 0) {
-                await fs.promises.copyFile(file, newPath);
+                await handlePasteProcess(file, newPath, false);
               } else if (res.response === 1) {
                 let newFileName = serializeName(
                   [
@@ -138,26 +146,24 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
                   " - ",
                   "Copy (%N%)"
                 );
+                console.log(newFileName);
                 newPath = path.join(dir.path, newFileName);
-                try {
-                  await fs.promises.copyFile(file, newPath);
-                } catch (error) {
-                  console.error(`Failed to copy file: ${error.message}`);
-                }
+                await handlePasteProcess(file, newPath, false);
               }
             });
-        } else await fs.promises.copyFile(file, newPath);
+        } else {
+          await handlePasteProcess(file, newPath, false);
+        }
       }
     } else if (cutFiles.length > 0) {
       dispatch(explorerActions.updateCurrentDir(dir.path));
       for (const file of cutFiles) {
+        dispatch(explorerActions.pasteFiles(cutFiles));
         const fileName = path.basename(file);
         const newPath = path.join(dir.path, fileName);
-        await fs.promises.rename(file, newPath);
+        await handlePasteProcess(file, newPath, true);
       }
     }
-
-    dispatch(explorerActions.pasteFiles(filePasted));
   };
 
   const cutFile = () => {
@@ -169,11 +175,8 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
   };
   const handleDelete = async (dir) => {
     try {
-      if (dir.dir) {
-        await fs.promises.rmdir(dir.path, { recursive: true });
-      } else {
-        await fs.promises.unlink(dir.path);
-      }
+      await fs.promises.rm(dir.path, { recursive: true, force: true });
+
       dispatch(explorerActions.removeDir(dir.path));
     } catch (error) {
       console.error(error);
@@ -442,11 +445,7 @@ const MultiDirContextMenu: FC<MultiDirContextMenuProps> = ({
 
   const handleDelete = async (dir) => {
     try {
-      if (dir.dir) {
-        await fs.promises.rmdir(dir.path, { recursive: true });
-      } else {
-        await fs.promises.unlink(dir.path);
-      }
+      await fs.promises.rm(dir.path, { recursive: true, force: true });
       dispatch(explorerActions.removeDir(dir.path));
     } catch (error) {
       console.error(error);

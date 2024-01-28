@@ -46,9 +46,6 @@ const useExplorer = () => {
       }
     }
 
-    const dirData = await getDirInformation(currentDir);
-    dispatch(explorerActions.updateCurrentDirData(dirData));
-
     dirs_files.sort((a, b) => {
       if (a.dir !== b.dir) {
         return a.dir ? -1 : 1;
