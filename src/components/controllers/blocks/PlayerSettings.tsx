@@ -61,7 +61,6 @@ const SettingsBlock: FC = () => {
       <div className="flex md:hidden items-center px-2 pb-2 min-scrollbar w-full overflow-auto">
         {tabs.map((tab, index) => {
           return (
-            <>
               <SettingSectionTab
                 key={index}
                 title={tab.title}
@@ -71,7 +70,6 @@ const SettingsBlock: FC = () => {
                 }}
                 vertical
               />
-            </>
           );
         })}
       </div>

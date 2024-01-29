@@ -72,7 +72,6 @@ const FilesViewer: FC = () => {
   }, [dirs]);
 
   useEffect(() => {
-    console.log(pastingProcess.length);
   }, [pastingProcess]);
 
   useEffect(() => {

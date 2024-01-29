@@ -1,70 +1,80 @@
-[
-  {
-    "name": "skip next",
-    "keys": ["alt", "→"]
-  },
-  {
-    "name": "skip previous",
-    "keys": ["alt", "←"]
-  },
-  {
-    "name": "fast forward",
-    "keys": ["→"]
-  },
-  {
-    "name": "fast backward",
-    "keys": ["←"]
-  },
-  {
-    "name": "double fast forward",
-    "keys": ["ctrl", "→"]
-  },
-  {
-    "name": "double fast backward",
-    "keys": ["ctrl", "←"]
-  },
-  {
-    "name": "restart video",
-    "keys": ["home"]
-  },
-  {
-    "name": "end video",
-    "keys": ["end"]
-  },
-  {
-    "name": "increase volume",
-    "keys": ["→"]
-  },
-  {
-    "name": "decrease volume",
-    "keys": ["←"]
-  },
-  {
-    "name": "double increase volume",
-    "keys": ["ctrl", "→"]
-  },
-  {
-    "name": "double decrease volume",
-    "keys": ["ctrl", "←"]
-  },
-  {
-    "name": "mute volume",
-    "keys": ["m"]
-  },
-  {
-    "name": "toggle full screen",
-    "keys": ["f"]
-  },
-  {
-    "name": "toggle video loop",
-    "keys": ["r"]
-  },
-  {
-    "name": "toggle lock player",
-    "keys": ["l"]
-  },
-  {
-    "name": "exit player",
-    "keys": ["ctrl", "e"]
-  }
-]
+{
+  "player": [
+    {
+      "name": "fast forward",
+      "keys": ["→"]
+    },
+    {
+      "name": "double fast forward",
+      "keys": ["ctrl", "→"]
+    },
+    {
+      "name": "fast backward",
+      "keys": ["←"]
+    },
+    {
+      "name": "double fast backward",
+      "keys": ["ctrl", "←"]
+    },
+    {
+      "name": "increase volume",
+      "keys": ["↑"]
+    },
+    {
+      "name": "double increase volume",
+      "keys": ["ctrl", "↑"]
+    },
+    {
+      "name": "decrease volume",
+      "keys": ["↓"]
+    },
+    {
+      "name": "double decrease volume",
+      "keys": ["ctrl", "↓"]
+    },
+    {
+      "name": "mute volume",
+      "keys": ["m"]
+    },
+    {
+      "name": "skip next",
+      "keys": ["alt", "→"]
+    },
+    {
+      "name": "toggle full screen",
+      "keys": ["f"]
+    },
+    {
+      "name": "skip previous",
+      "keys": ["alt", "←"]
+    },
+    {
+      "name": "toggle lock player",
+      "keys": ["l"]
+    },
+    {
+      "name": "exit player",
+      "keys": ["ctrl", "e"]
+    },
+    {
+      "name": "toggle video loop",
+      "keys": ["r"]
+    },
+    {
+      "name": "restart video",
+      "keys": ["home"]
+    },
+    {
+      "name": "toggle play/pause",
+      "keys": ["space"]
+    },
+    {
+      "keys":["1 ~ 9"],
+      "name": "jump to 10% ~ 90% of video"
+    },
+    {
+      "name": "end video",
+      "keys": ["end"]
+    }
+  ]
+}

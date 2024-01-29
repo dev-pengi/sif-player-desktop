@@ -4,7 +4,7 @@ import { DropdownMenu } from "@radix-ui/themes";
 import Button from "./Button";
 import { MenuIcon } from "../../../assets";
 import { Modal } from "../../modals";
-import { PlayerSettings, MediaInfo } from "../blocks";
+import { PlayerSettings, MediaInfo ,PlayerShortcutsGuide} from "../blocks";
 import { usePlayer } from "../../../hooks";
 import { useAppSelector } from "../../../hooks";
 import { useDispatch } from "react-redux";
@@ -23,6 +23,7 @@ const MenuButton: FC = () => {
     handleTogglePiP,
   } = usePlayer();
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState(false);
   const [mediaInfoModalOpen, setMediaInfoModalOpen] = useState(false);
 
   const handleLoopToggle = () => {
@@ -47,6 +48,14 @@ const MenuButton: FC = () => {
   const handleMediaInfoClose = () => {
     setMediaInfoModalOpen(false);
     handleRemoveControllerDependencies("media-info");
+  };
+  const handleShortcutsOpen = () => {
+    setShortcutsModalOpen(true);
+    handleAddControllerDependencies("shortcuts");
+  };
+  const handleShortcutsClose = () => {
+    setShortcutsModalOpen(false);
+    handleRemoveControllerDependencies("shortcuts");
   };
 
   return (
@@ -128,7 +137,7 @@ const MenuButton: FC = () => {
             <p>More Settings</p>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
-          <DropdownMenu.Item>
+          <DropdownMenu.Item onSelect={handleShortcutsOpen}>
             <p>Keyboard Shortcuts</p>
           </DropdownMenu.Item>
           <DropdownMenu.Item onSelect={handleMediaInfoOpen}>
@@ -155,6 +164,19 @@ const MenuButton: FC = () => {
       >
         <PlayerSettings />
       </Modal>
+
+      <Modal
+        isOpen={shortcutsModalOpen}
+        onClose={handleShortcutsClose}
+        style={{
+          box: { maxWidth: "1000px" },
+          content: { minHeight: "100px" },
+        }}
+        title="Keyboard Shortcuts"
+      >
+        <PlayerShortcutsGuide /> 
+      </Modal>
+
       <Modal
         isOpen={mediaInfoModalOpen}
         onClose={handleMediaInfoClose}

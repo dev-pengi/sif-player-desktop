@@ -19,10 +19,11 @@ const MiniProgress: FC = () => {
       <div
         style={{
           background: "#ffffff20",
-          height: 5,
+          height: 4,
           opacity: showMiniBar && miniProgressBar ? 1 : 0,
+          bottom: showMiniBar && miniProgressBar ? 0 : -5,
         }}
-        className="w-full absolute -bottom-[1px] left-0 z-[1000] duration-100"
+        className="w-full absolute left-0 z-[1000] duration-200"
       >
         <motion.div
           className="w-full h-full absolute left-0 bottom-0 right-0"

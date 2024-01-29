@@ -51,8 +51,12 @@ const useEvents = () => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
-    const enterPiPHandler = () => dispatch(playerActions.enterPiP());
-    const leavePiPHandler = () => dispatch(playerActions.exitPiP());
+    const enterPiPHandler = () => {
+      dispatch(playerActions.enterPiP());
+    };
+    const leavePiPHandler = () => {
+      dispatch(playerActions.exitPiP());
+    };
 
     videoElement.addEventListener("enterpictureinpicture", enterPiPHandler);
     videoElement.addEventListener("leavepictureinpicture", leavePiPHandler);
@@ -67,7 +71,7 @@ const useEvents = () => {
         leavePiPHandler
       );
     };
-  }, [isPiP]);
+  }, [isPiP, videoSrc]);
 
   const calculateBufferedPercentage = () => {
     if (!videoRef.current) return 0;
