@@ -3,6 +3,7 @@ import { usePlayer, useTimer, useVolume } from ".";
 import { useAppSelector } from ".";
 import { useDispatch } from "react-redux";
 import { controlsActions, playerActions, settingsActions } from "../store";
+import { numpadVideoSeeker } from "../utils";
 
 const useShortcuts = () => {
   const dispatch = useDispatch();
@@ -139,6 +140,18 @@ const useShortcuts = () => {
       handleBack();
     },
     true
+  );
+
+  useHotkeys(
+    "1,2,3,4,5,6,7,8,9,0",
+    (e) => {
+      if (!shortcutsEnabled || (isLocked && lockShortcuts)) return;
+      handleSeek(numpadVideoSeeker(duration, Number(e.key)));
+    },
+    {
+      keyup: true,
+      keydown: false,
+    }
   );
 };
 

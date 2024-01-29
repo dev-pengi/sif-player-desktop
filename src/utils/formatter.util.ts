@@ -103,6 +103,13 @@ const separateText = (text: string, separator?: string, separateSymbols?: string
     return newText;
 }
 
+const numpadVideoSeeker = (duration: number, number: number) => {
+    if (number === 0) return 0;
+
+    const time = duration * (number / 10);
+
+    return time;
+}
 
 const serializeName = (previousTexts: string[], newText: string, separator: string = " ", suffix: string = "(%N%)", ext: boolean = true) => {
     if (!suffix) suffix = "(%N%)";
@@ -112,7 +119,7 @@ const serializeName = (previousTexts: string[], newText: string, separator: stri
     const escapedSuffix = suffix.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
 
-    
+
     let saveExtension = null;
 
     if (ext) {
@@ -149,4 +156,4 @@ const serializeName = (previousTexts: string[], newText: string, separator: stri
     return serializedText;
 }
 
-export { formatTime, formatResolution, formatBytes, videoType, formatDate, separateText, serializeName };
+export { formatTime, formatResolution, formatBytes, videoType, formatDate, separateText, serializeName, numpadVideoSeeker };

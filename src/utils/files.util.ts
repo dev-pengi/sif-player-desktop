@@ -7,7 +7,7 @@ const getDirInformation = async (
 ): Promise<Dir> => {
     const dirName = path.basename(dirPath);
     const parentDir = path.dirname(dirPath);
-    if (dirName.startsWith(".")) throw new Error('hidden dir')
+    if (dirName.startsWith(".")) throw new Error('hidden dir');
 
     let file: any = {};
     const dirStat = await fs.promises.stat(dirPath);
@@ -83,18 +83,18 @@ const extractVideos = (dirs: any[], extractPath = false, isSearching = false) =>
 
     if (extractPath) videos = videos.map(video => video.path);
 
-    return videos
+    return videos;
 }
 
 const sortFiles = (files: Dir[], sortType: SortType = 'newest', foldersFirst = true) => {
     const sortedFiles = files.sort((a, b) => {
         if (a.dir && !b.dir) return foldersFirst ? -1 : 1
         if (!a.dir && b.dir) return foldersFirst ? 1 : -1
-        if (sortType === 'newest') return b.creationDate - a.creationDate
+        if (sortType === 'newest') {return b.creationDate - a.creationDate}
         if (sortType === 'oldest') return a.creationDate - b.creationDate
         if (sortType === 'name') return a.name.localeCompare(b.name)
         if (sortType === 'size') return 0
-        return 0
+        
     })
 
     return sortedFiles;

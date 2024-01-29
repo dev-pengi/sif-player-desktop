@@ -87,15 +87,16 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
   const handlePasteProcess = async (
     oldPath: string,
     newPath: string,
+    isDir: boolean,
     isMoved: boolean
   ) => {
     try {
       if (isMoved) {
         await fs.promises.rename(oldPath, newPath);
       } else {
-        await fs.promises.copyFile(oldPath, newPath);
+        if (isDir) await fs.promises.cp(oldPath, newPath, { recursive: true });
+        else await fs.promises.copyFile(oldPath, newPath);
       }
-      console.log("finished");
     } catch (error) {
       dialog.showMessageBox({
         type: "error",
@@ -175,7 +176,7 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
       const fileExists = await checkFileExists(newPath);
 
       if (fileExists && behavior === "replace") {
-        await handlePasteProcess(file.path, newPath, file.move);
+        await handlePasteProcess(file.path, newPath, dir.dir, file.move);
       } else if (fileExists && behavior === "rename") {
         let newFileName = serializeName(
           [
@@ -187,9 +188,9 @@ const SingleDirContextMenu: FC<SingleDirContextMenuProps> = ({
           "Copy (%N%)"
         );
         const newPath = path.join(dir.path, newFileName);
-        await handlePasteProcess(file.path, newPath, file.move);
+        await handlePasteProcess(file.path, newPath, dir.dir, file.move);
       } else {
-        await handlePasteProcess(file.path, newPath, file.move);
+        await handlePasteProcess(file.path, newPath, dir.dir, file.move);
       }
     }
   };
