@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import DragSelect from "dragselect";
 
 import { DirChain } from "..";
@@ -12,7 +13,6 @@ import {
 import DirContextMenu from "../Dirs/DirContextMenu";
 import { getDirInformation, path } from "../../../utils";
 import { explorerActions } from "../../../store";
-import { useDispatch } from "react-redux";
 
 const FilesViewer: FC = () => {
   const dispatch = useDispatch();
@@ -24,6 +24,7 @@ const FilesViewer: FC = () => {
 
   const dirCardRefs = useRef([]);
   const explorerAreaRef = useRef(null);
+
   const { fetchFiles, handleDragSelectDirs, resetSelections, handleNavigate } =
     useExplorer();
 
@@ -54,10 +55,10 @@ const FilesViewer: FC = () => {
     try {
       ds.addSelectables(dirCardRefs.current.map((ref) => ref.current));
 
-      ds.subscribe("DS:start", (el) => {
+      ds.subscribe("DS:start", () => {
         setIsSelecting(true);
       });
-      ds.subscribe("DS:end", (el) => {
+      ds.subscribe("DS:end", () => {
         setIsSelecting(false);
         handleDragSelectDirs(ds, dirCardRefs);
       });
@@ -71,8 +72,7 @@ const FilesViewer: FC = () => {
     };
   }, [dirs]);
 
-  useEffect(() => {
-  }, [pastingProcess]);
+  useEffect(() => {}, [pastingProcess]);
 
   useEffect(() => {
     const handleUpdateCurrentDirData = async () => {
@@ -104,6 +104,7 @@ const FilesViewer: FC = () => {
       }
     };
   }, []);
+
 
   return (
     <>
