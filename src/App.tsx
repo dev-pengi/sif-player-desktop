@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { MainPage, PlayerPage } from "./pages";
 import { Theme } from "@radix-ui/themes";
-// import "@radix-ui/themes/styles.css";
 import { useAppSelector } from "./hooks";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +10,6 @@ import { playerActions } from "./store";
 
 import { ipcRenderer, path, fs } from "./utils/node.util";
 
-
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,7 +17,7 @@ function App() {
 
   const requestOpenedFilePath = () => {
     ipcRenderer.send("request-file-path");
-    ipcRenderer.on("file-path", async (_, filePath) => {
+    ipcRenderer.on("file-path", async (_, filePath: string) => {
       try {
         const fileCheck = path.parse(filePath);
         const parentDirents = await fs.promises.readdir(fileCheck.dir, {

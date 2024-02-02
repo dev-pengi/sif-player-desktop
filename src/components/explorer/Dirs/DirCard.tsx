@@ -93,7 +93,7 @@ const DirCard: FC<DirCardProps> = ({ dir }) => {
           onClick={handleDirSelect}
           className={`dir-card relative flex items-center justify-start px-3 gap-3 cursor-pointer ${
             isSelected ? "bg-[#ffffff21]" : "hover:bg-[#ffffff16]"
-          } rounded-md py-2`}
+          } rounded-md h-[50px]`}
         >
           {!dir.dir && (
             <HoverCard.Root>

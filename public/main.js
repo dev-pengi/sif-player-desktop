@@ -144,7 +144,7 @@ function createWindow() {
   }
 
   ipcMain.on("close", () => {
-    win.close();
+    win.hide();
   });
 
   ipcMain.on("minimize", () => {
@@ -192,6 +192,9 @@ function createWindow() {
         },
       },
     ]);
+    tray.on("click", () => {
+      win.show();
+    });
     tray.setToolTip("Sif Player");
     tray.setContextMenu(contextMenu);
   });
@@ -200,7 +203,7 @@ function createWindow() {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", function () {
-  app.quit();
+  // app.quit();
 });
 
 app.on("activate", function () {
