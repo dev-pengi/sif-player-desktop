@@ -42,17 +42,13 @@ const BottomController: FC = () => {
             className="relative flex w-full items-center px-12 h-[80px] flex-col"
           >
             <TrackSlider />
-            <div className="flex justify-center w-full mt-2">
-              <div className="relative flex items-center justify-start flex-1">
+            <div className="flex justify-between w-full mt-2">
+              <div className="relative flex items-center justify-start flex-1 gap-3">
                 <PlayToggle />
-                <div className="ml-[14px]">
-                  <LockButton />
-                </div>
+                <LockButton />
                 <LayoutGroup>
-                  <div className="ml-3">
-                    <VolumeSlider />
-                  </div>
-                  <motion.div layout className="ml-3">
+                  <VolumeSlider />
+                  <motion.div layout>
                     <motion.p
                       transition={{
                         duration: 0,
@@ -65,13 +61,10 @@ const BottomController: FC = () => {
                   </motion.div>
                 </LayoutGroup>
               </div>
-              <div className="relative flex items-center justify-center"></div>
-              <div className="relative flex items-center justify-end flex-1">
+              <div className="relative flex items-center justify-end flex-1 gap-3">
                 <PlaylistControls />
                 <PlayBackSpeed />
-                <div className="ml-3">
-                  <FullScreenButton />
-                </div>
+                <FullScreenButton />
               </div>
             </div>
           </motion.div>

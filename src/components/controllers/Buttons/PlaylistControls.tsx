@@ -78,7 +78,6 @@ const PlaylistControls: FC = () => {
               onClick={() => {
                 dispatch(playerActions.decrementVideoIndex());
               }}
-              className="mr-3"
               disabled={videoIndex === 0}
             >
               <div className="absolute text-[16px] left-0 right-0 top-0 bottom-0 h-max w-max m-auto">
@@ -89,7 +88,7 @@ const PlaylistControls: FC = () => {
           <Popover.Root>
             <Popover.Trigger>
               <div>
-                <Button className="mr-3">
+                <Button>
                   <div className="absolute text-[25px] left-0 right-0 top-0 bottom-0 h-max w-max m-auto">
                     <PlayListIcon />
                   </div>
@@ -152,7 +151,6 @@ const PlaylistControls: FC = () => {
               onClick={() => {
                 dispatch(playerActions.incrementVideoIndex());
               }}
-              className="mr-3"
               disabled={videoIndex >= playlist.length - 1}
             >
               <div className="absolute text-[16px] left-0 right-0 top-0 bottom-0 h-max w-max m-auto">

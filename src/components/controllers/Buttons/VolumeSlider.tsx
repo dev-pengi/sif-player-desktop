@@ -24,55 +24,55 @@ const VolumeSlider: FC = ({}) => {
   };
 
   const sliderControls = useAnimation();
-  const maxSoundControls = useAnimation();
-  const minSoundControls = useAnimation();
-  const muteSoundControls = useAnimation();
+  // const maxSoundControls = useAnimation();
+  // const minSoundControls = useAnimation();
+  // const muteSoundControls = useAnimation();
 
-  const currentMaxVar = useRef("hidden");
-  const currentMinVar = useRef("hidden");
-  const currentMuteVar = useRef("visible");
+  // const currentMaxVar = useRef("hidden");
+  // const currentMinVar = useRef("hidden");
+  // const currentMuteVar = useRef("visible");
 
-  const handleIconsAnimations = () => {
-    if (isMuted || volume === 0) {
-      if (currentMaxVar.current !== "hidden") maxSoundControls.start("hidden");
-      if (currentMinVar.current !== "hidden") minSoundControls.start("hidden");
-      if (currentMuteVar.current !== "visible")
-        muteSoundControls.start("visible");
-      currentMaxVar.current = "hidden";
-      currentMinVar.current = "hidden";
-      currentMuteVar.current = "visible";
-    } else if (volume > 50) {
-      if (currentMaxVar.current !== "visible")
-        maxSoundControls.start("visible");
-      if (currentMinVar.current !== "hidden") minSoundControls.start("hidden");
-      if (currentMuteVar.current !== "hidden")
-        muteSoundControls.start("hidden");
-      currentMaxVar.current = "visible";
-      currentMinVar.current = "hidden";
-      currentMuteVar.current = "hidden";
-    } else if (volume <= 50 && volume > 0) {
-      if (currentMaxVar.current !== "hidden") maxSoundControls.start("hidden");
-      if (currentMinVar.current !== "visible")
-        minSoundControls.start("visible");
-      if (currentMuteVar.current !== "hidden")
-        muteSoundControls.start("hidden");
-      currentMaxVar.current = "hidden";
-      currentMinVar.current = "visible";
-      currentMuteVar.current = "hidden";
-    }
-  };
+  // const handleIconsAnimations = () => {
+  //   if (isMuted || volume === 0) {
+  //     if (currentMaxVar.current !== "hidden") maxSoundControls.start("hidden");
+  //     if (currentMinVar.current !== "hidden") minSoundControls.start("hidden");
+  //     if (currentMuteVar.current !== "visible")
+  //       muteSoundControls.start("visible");
+  //     currentMaxVar.current = "hidden";
+  //     currentMinVar.current = "hidden";
+  //     currentMuteVar.current = "visible";
+  //   } else if (volume > 50) {
+  //     if (currentMaxVar.current !== "visible")
+  //       maxSoundControls.start("visible");
+  //     if (currentMinVar.current !== "hidden") minSoundControls.start("hidden");
+  //     if (currentMuteVar.current !== "hidden")
+  //       muteSoundControls.start("hidden");
+  //     currentMaxVar.current = "visible";
+  //     currentMinVar.current = "hidden";
+  //     currentMuteVar.current = "hidden";
+  //   } else if (volume <= 50 && volume > 0) {
+  //     if (currentMaxVar.current !== "hidden") maxSoundControls.start("hidden");
+  //     if (currentMinVar.current !== "visible")
+  //       minSoundControls.start("visible");
+  //     if (currentMuteVar.current !== "hidden")
+  //       muteSoundControls.start("hidden");
+  //     currentMaxVar.current = "hidden";
+  //     currentMinVar.current = "visible";
+  //     currentMuteVar.current = "hidden";
+  //   }
+  // };
 
-  useEffect(() => {
-    handleIconsAnimations();
-  }, [volume, isMuted]);
+  // useEffect(() => {
+  //   handleIconsAnimations();
+  // }, [volume, isMuted]);
 
-  useEffect(() => {
-    return () => {
-      currentMaxVar.current = null;
-      currentMinVar.current = null;
-      currentMuteVar.current = null;
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     currentMaxVar.current = null;
+  //     currentMinVar.current = null;
+  //     currentMuteVar.current = null;
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (!(isPanelHovering || isDragging)) sliderControls.start("hidden");
@@ -92,7 +92,7 @@ const VolumeSlider: FC = ({}) => {
       style={{
         borderRadius: 6,
       }}
-      className="pl-2.5 pr-1.5 py-1.5"
+      className="px-2.5 py-1.5 "
       onMouseEnter={() => setIsButtonHovering(true)}
       onMouseLeave={() => setIsButtonHovering(false)}
     >
@@ -102,7 +102,7 @@ const VolumeSlider: FC = ({}) => {
             className="absolute left-0 right-0 top-0 bottom-0 h-max w-max m-auto"
             variants={iconVariants}
             initial="visible"
-            animate={maxSoundControls}
+            animate={volume >= 50 ? "visible" : "hidden"}
             transition={{
               duration: allowAnimations ? 0.1 : 0,
             }}
@@ -113,7 +113,7 @@ const VolumeSlider: FC = ({}) => {
             className="absolute left-0 right-0 top-0 bottom-0 h-max w-max m-auto"
             variants={iconVariants}
             initial="hidden"
-            animate={minSoundControls}
+            animate={volume > 0 && volume < 50 ? "visible" : "hidden"}
             transition={{
               duration: allowAnimations ? 0.1 : 0,
             }}
@@ -124,7 +124,7 @@ const VolumeSlider: FC = ({}) => {
             className="absolute left-0 right-0 top-0 bottom-0 h-max w-max m-auto"
             variants={iconVariants}
             initial="hidden"
-            animate={muteSoundControls}
+            animate={isMuted || volume === 0 ? "visible" : "hidden"}
             transition={{
               duration: allowAnimations ? 0.1 : 0,
             }}
@@ -158,7 +158,7 @@ const VolumeSlider: FC = ({}) => {
             onChange={handleVolumeSlide}
             onChangeComplete={() => setIsDragging(false)}
             keyboard={false}
-            style={{ width: 60, marginLeft: 15, marginRight: 10 }}
+            style={{ width: 60, marginLeft: 15, marginRight: 8 }}
             styles={{
               handle: {
                 border: "none",
