@@ -1,12 +1,4 @@
-const {
-  app,
-  BrowserWindow,
-  Menu,
-  ipcMain,
-  shell,
-  dialog,
-  Tray,
-} = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog, Tray } = require("electron");
 const { exec } = require("child_process");
 const { autoUpdater } = require("electron-updater");
 const rpc = require("discord-rpc");
@@ -23,7 +15,6 @@ const path = require("path");
 const isDev = require("electron-is-dev");
 
 function createWindow() {
-
   const win = new BrowserWindow({
     width: 900,
     height: 650,
@@ -40,13 +31,6 @@ function createWindow() {
       enableRemoteModule: true,
       devTools: isDev,
     },
-  });
-
-  win.once("ready-to-show", () => {
-    win.moveTop();
-    win.focus();
-    win.show();
-    win.webContents.send("open-file-path", process.argv[1]);
   });
 
   autoUpdater.setFeedURL({
@@ -76,17 +60,32 @@ function createWindow() {
     });
   };
 
+  win.once("ready-to-show", () => {
+    win.moveTop();
+    win.focus();
+    win.show();
+  });
+
+  if (process.argv.length >= 2) {
+    let filePath = process.argv[1];
+
+    ipcMain.on("request-file-path", (event) => {
+      event.sender.send("open-file-path", filePath);
+    });
+  }
+
   const gotTheLock = app.requestSingleInstanceLock();
 
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on("second-instance", () => {
+    app.on("second-instance", (event, argv) => {
       if (win) {
         if (win.isMinimized()) win.restore();
         win.focus();
         win.show();
-        win.webContents.send("open-file-path", process.argv[1]);
+        win.webContents.send("open-file-path", argv[2]);
+        console.log(argv);
       }
     });
   }
@@ -116,7 +115,7 @@ function createWindow() {
       activityObject.smallImageKey = "icon-rounded";
       activityObject.smallImageText = args?.filename;
     }
-    rpcClient.setActivity(activityObject);
+    rpcClient.setActivity(activityObject).catch(console.error);
   });
   ipcMain.on("rpc-clear", (event, args) => {
     rpcClient.clearActivity();
@@ -141,7 +140,6 @@ function createWindow() {
   }
 
   win.loadURL(currentURL);
-
 
   ipcMain.on("shutdown", () => {
     if (process.platform === "win32") {
