@@ -30,6 +30,7 @@ const defaultSettings = {
     sleepModeBehavior: "pause", // pause, quit video, close app, pc sleep, pc shutdown
     allowRPC: true,
     miniProgressBar: false,
+    closeToTray: true,
 }
 
 const colorCheck = (color: string) => {
@@ -64,6 +65,7 @@ const initialState = {
     sleepModeBehavior: extractLocalStorage("sleep-mode-behavior", "pause", "string"),
     allowRPC: extractLocalStorage("allow-rpc", true, "boolean"),
     miniProgressBar: extractLocalStorage("mini-progress-bar", false, "boolean"),
+    closeToTray: extractLocalStorage("close-to-tray", true, "boolean"),
 }
 
 const settingsSlice = createSlice({
@@ -177,6 +179,10 @@ const settingsSlice = createSlice({
         toggleMiniProgressBar(state) {
             localStorage.setItem("mini-progress-bar", String(!state.miniProgressBar));
             state.miniProgressBar = !state.miniProgressBar
+        },
+        toggleCloseToTray(state) {
+            localStorage.setItem("close-to-tray", String(!state.closeToTray));
+            state.closeToTray = !state.closeToTray
         },
         reset() {
             return initialState;

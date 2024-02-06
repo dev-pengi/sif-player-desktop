@@ -20,10 +20,10 @@ rpcClient.login({ clientId }).catch(console.error);
 require("@electron/remote/main").initialize();
 
 const path = require("path");
-const fs = require("fs");
 const isDev = require("electron-is-dev");
 
 function createWindow() {
+
   const win = new BrowserWindow({
     width: 900,
     height: 650,
@@ -46,6 +46,7 @@ function createWindow() {
     win.moveTop();
     win.focus();
     win.show();
+    win.webContents.send("open-file-path", process.argv[1]);
   });
 
   autoUpdater.setFeedURL({
@@ -74,6 +75,21 @@ function createWindow() {
         });
     });
   };
+
+  const gotTheLock = app.requestSingleInstanceLock();
+
+  if (!gotTheLock) {
+    app.quit();
+  } else {
+    app.on("second-instance", () => {
+      if (win) {
+        if (win.isMinimized()) win.restore();
+        win.focus();
+        win.show();
+        win.webContents.send("open-file-path", process.argv[1]);
+      }
+    });
+  }
 
   const startTimestamp = Date.now();
 
@@ -105,15 +121,6 @@ function createWindow() {
   ipcMain.on("rpc-clear", (event, args) => {
     rpcClient.clearActivity();
   });
-
-  win.on("maximize", () => {
-    win.webContents.send("maximized");
-  });
-
-  win.on("unmaximize", () => {
-    win.webContents.send("unmaximized");
-  });
-
   checkForUpdates();
   ipcMain.on("check-update", (event) => {
     checkForUpdates();
@@ -135,30 +142,6 @@ function createWindow() {
 
   win.loadURL(currentURL);
 
-  if (process.argv.length >= 2) {
-    let filePath = process.argv[1];
-
-    ipcMain.on("request-file-path", (event) => {
-      event.sender.send("file-path", filePath);
-    });
-  }
-
-  ipcMain.on("close", () => {
-    win.hide();
-  });
-
-  ipcMain.on("minimize", () => {
-    win.minimize();
-  });
-
-  ipcMain.on("platform", (event) => {
-    event.sender.send("platform", process.platform);
-  });
-
-  ipcMain.on("maximize", () => {
-    if (win.isMaximized()) win.unmaximize();
-    else win.maximize();
-  });
 
   ipcMain.on("shutdown", () => {
     if (process.platform === "win32") {

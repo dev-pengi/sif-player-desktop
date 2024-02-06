@@ -9,7 +9,7 @@ import {
   ExplorerSectionTab,
 } from "../components";
 import { explorerActions } from "../store";
-import { ipcRenderer } from "../utils";
+import { closeApp, maximizeApp, minimizeApp } from "../utils";
 
 const tabs = [
   {
@@ -32,20 +32,10 @@ const MainPage: FC = () => {
 
   useClean();
 
-  const { allowRPC } = useAppSelector((state) => state.settings);
+  const { allowRPC, closeToTray } = useAppSelector((state) => state.settings);
   const { searchKeyword, dirs } = useAppSelector((state) => state.explorer);
 
   const [activeTab, setActiveTab] = useState(0);
-
-  const handleClose = () => {
-    ipcRenderer.send("close");
-  };
-  const handleMaximizeToggle = () => {
-    ipcRenderer.send("maximize");
-  };
-  const handleMinimize = () => {
-    ipcRenderer.send("minimize");
-  };
 
   useEffect(() => {
     if (allowRPC) {
@@ -70,19 +60,19 @@ const MainPage: FC = () => {
         </div>
         <div className="flex flex-row-reverse h-full items-center no-drag">
           <div
-            onClick={handleClose}
+            onClick={() => closeApp(closeToTray)}
             className="w-[45px] flex items-center justify-center h-full duration-100 text-[18px] hover:bg-danger"
           >
             <CloseIcon />
           </div>
           <div
-            onClick={handleMaximizeToggle}
+            onClick={maximizeApp}
             className="w-[45px] flex items-center justify-center h-full duration-100 text-[14px] hover:bg-[#ffffff21]"
           >
             <WindowMaximizeIcon />
           </div>
           <div
-            onClick={handleMinimize}
+            onClick={minimizeApp}
             className="w-[45px] flex items-center justify-center h-full duration-100  hover:bg-[#ffffff21]"
           >
             <DashIcon />

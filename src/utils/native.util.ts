@@ -42,5 +42,27 @@ const nativeDialog = async (message: string, options: DialogOptions = defaultOpt
     return promise;
 }
 
+const closeApp = (closeToTray: boolean = false) => {
+    const window = electron.getCurrentWindow();
+    if (closeToTray) {
+        window.hide();
+    } else {
+        electron.app.quit();
+    }
+}
 
-export { nativeDialog };
+const minimizeApp = () => {
+    electron.getCurrentWindow().minimize();
+}
+
+const maximizeApp = () => {
+    const window = electron.getCurrentWindow();
+    if (window.isMaximized()) {
+        window.unmaximize();
+    } else {
+        window.maximize();
+    }
+}
+
+
+export { nativeDialog, closeApp, minimizeApp, maximizeApp };
