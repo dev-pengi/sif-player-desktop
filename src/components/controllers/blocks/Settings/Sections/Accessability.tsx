@@ -100,18 +100,18 @@ const Accessability: FC = () => {
               checked={fullScreenOnDoubleClick}
             />
           </SettingCol>
-          <Separator />
-          <SettingCol
-            title="Close to Tray"
-            description="minimize the app to the system tray instead of closing it, you can reopen/quit the app from the tray"
-          >
-            <SettingSwitch
-              onChange={handleCloseToTrayToggle}
-              checked={closeToTray}
-            />
-          </SettingCol>
         </>
       )}
+      <Separator />
+      <SettingCol
+        title="Close to Tray"
+        description="minimize the app to the system tray instead of closing it, you can reopen/quit the app from the tray"
+      >
+        <SettingSwitch
+          onChange={handleCloseToTrayToggle}
+          checked={closeToTray}
+        />
+      </SettingCol>
     </>
   );
 };
