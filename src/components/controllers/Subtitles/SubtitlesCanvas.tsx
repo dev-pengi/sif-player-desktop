@@ -23,7 +23,7 @@ const SubtitlesCanvas: FC = () => {
   };
 
   useEffect(() => {
-    if (!subtitles || !subtitleCanvasRef.current) return
+    if (!subtitles || !subtitleCanvasRef.current) return console.log("none");
 
     if (!selectedSubtitles.length) {
       fetchSubtitles(subtitles);
@@ -32,6 +32,7 @@ const SubtitlesCanvas: FC = () => {
   }, [subtitles, selectedSubtitles]);
 
   useEffect(() => {
+    console.log("start", subtitleCanvasRef, selectedSubtitles);
     if (!subtitleCanvasRef.current || !selectedSubtitles.length) return;
 
     const canvas = subtitleCanvasRef.current;
@@ -39,6 +40,7 @@ const SubtitlesCanvas: FC = () => {
 
     if (!ctx) return;
 
+    // Find subtitles that should be displayed at current time
     const currentSubtitles = selectedSubtitles.find(
       (subtitle) => currentTime >= subtitle.start && currentTime <= subtitle.end
     );
@@ -68,8 +70,8 @@ const SubtitlesCanvas: FC = () => {
     img.src = currentSubtitles.image;
 
     img.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, subtitleWidth, subtitleHeight);
+      ctx.drawImage(img, 0, 0, subtitleWidth, subtitleHeight);
     };
   }, [currentTime, selectedSubtitles]);
 
