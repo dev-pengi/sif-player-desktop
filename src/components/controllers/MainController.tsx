@@ -11,6 +11,7 @@ import { throttle } from "lodash";
 import { useDispatch } from "react-redux";
 import { controlsActions } from "../../store";
 import MiniProgress from "./Track/MiniProgress";
+import SubtitlesCanvas from "./Subtitles/SubtitlesCanvas";
 
 const CONTROLLER_DEP: string = "active";
 
@@ -73,6 +74,7 @@ const MainController: FC = () => {
       <CenterController />
       <BottomController />
       <LockedController />
+      <SubtitlesCanvas />
       <MiniProgress />
     </div>
   );

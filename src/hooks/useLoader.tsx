@@ -2,6 +2,8 @@ import { useDispatch } from "react-redux";
 import { usePlayerContext } from "../contexts";
 import { playerActions, timerActions } from "../store";
 import { useAppSelector, useStore, useTimer } from ".";
+import { useCallback, useEffect } from "react";
+import { ipcRenderer } from "../utils";
 
 const useLoader = () => {
   const dispatch = useDispatch();
@@ -22,11 +24,27 @@ const useLoader = () => {
     dispatch(playerActions.loading());
   };
 
+  const loadSubtitles = () => {
+    async function extractSubtitles(videoPath: string) {
+      try {
+        const subtitles = await ipcRenderer.invoke(
+          "extract-subtitles",
+          videoPath
+        );
+        if (subtitles) dispatch(playerActions.setSubtitles(subtitles));
+      } catch (error) {
+        console.error("Failed to extract subtitles:", error);
+      }
+    }
+    extractSubtitles(videoSrc);
+  };
+
   const handleLoadEnd = () => {
     dispatch(playerActions.import());
     const data = handleFetchData(null, videoSrc);
     dispatch(playerActions.loaded());
     dispatch(timerActions.init(videoRef.current.duration));
+    loadSubtitles();
     let videoTime = 0;
     if (data) {
       const { time } = data;

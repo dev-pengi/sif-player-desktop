@@ -35,7 +35,7 @@ const VideoPlayer: FC = () => {
 
   const handlePlayVideo = useCallback(() => {
     dispatch(playerActions.play());
-  }, []);
+  }, [videoSrc]);
 
   const handlePauseVideo = useCallback(() => {
     dispatch(playerActions.pause());
@@ -86,7 +86,7 @@ const VideoPlayer: FC = () => {
           onPause={handlePauseVideo}
           onEnded={handleVideoEnd}
           autoPlay
-        ></video>
+        />
       )}
       <DarkLayer />
       <MainController />

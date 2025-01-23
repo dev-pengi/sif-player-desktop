@@ -11,8 +11,6 @@ const usePlayer = () => {
   const { isPlaying } = useAppSelector((state) => state.player);
   const { videoRef } = usePlayerContext();
 
-  const { handleStoreData } = useStore();
-
   const handleToggleScreen = () => {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.body.requestFullscreen();

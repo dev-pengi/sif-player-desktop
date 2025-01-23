@@ -11,14 +11,13 @@ const useEvents = () => {
   const [isBackgroundPause, setIsBackgroundPause] = useState(false);
 
   const { videoRef } = usePlayerContext();
-  const { isPlaying, isPiP, mediaData, videoSrc } = useAppSelector(
+  const { isPlaying, isPiP, videoSrc } = useAppSelector(
     (state) => state.player
   );
   const { playInBackground } = useAppSelector((state) => state.settings);
   const { duration, currentTime } = useAppSelector((state) => state.timer);
 
   const { handlePause, handlePlay } = usePlayer();
-  const { handleStoreData } = useStore();
 
   useEffect(() => {
     const handleFullScreenChange = () => {

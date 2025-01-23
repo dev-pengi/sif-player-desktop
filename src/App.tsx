@@ -18,7 +18,6 @@ function App() {
   const requestOpenedFilePath = () => {
     ipcRenderer.send("request-file-path");
     ipcRenderer.on("open-file-path", async (_, filePath: string) => {
-      console.log("file path", filePath);
       try {
         const fileCheck = path.parse(filePath);
         const parentDirents = await fs.promises.readdir(fileCheck.dir, {
